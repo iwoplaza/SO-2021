@@ -1,0 +1,31 @@
+####################
+# SHARED
+####################
+
+merge_files (4 lines)                   259 ticks,   0.259000 ms
+merge_files (100 lines)                 635 ticks,   0.635000 ms
+merge_files (20000 lines)             50252 ticks,  50.252000 ms
+save_block (4 lines)                    142 ticks,   0.142000 ms
+save_block (100 lines)                  297 ticks,   0.297000 ms
+save_block (20000 lines)              38090 ticks,  38.090000 ms
+remove_block (4 lines)                    1 ticks,   0.001000 ms
+remove_block (100 lines)                  9 ticks,   0.009000 ms
+remove_block (20000 lines)             1183 ticks,   1.183000 ms
+
+####################
+# DYNAMICALLY LOADED
+####################
+
+merge_files (4 lines)                   240 ticks,   0.240000 ms
+merge_files (100 lines)                 451 ticks,   0.451000 ms
+merge_files (20000 lines)             53185 ticks,  53.185000 ms
+save_block (4 lines)                    188 ticks,   0.188000 ms
+save_block (100 lines)                  316 ticks,   0.316000 ms
+save_block (20000 lines)              40809 ticks,  40.809000 ms
+remove_block (4 lines)                    2 ticks,   0.002000 ms
+remove_block (100 lines)                  7 ticks,   0.007000 ms
+remove_block (20000 lines)             1196 ticks,   1.196000 ms
+
+####################
+
+Wyniki nie różnią się znacząco

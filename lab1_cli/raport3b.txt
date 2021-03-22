@@ -1,0 +1,185 @@
+####################
+# STATIC - O0
+####################
+
+merge_files (4 lines)                   285 ticks,   0.285000 ms
+merge_files (100 lines)                 508 ticks,   0.508000 ms
+merge_files (20000 lines)             51245 ticks,  51.245000 ms
+save_block (4 lines)                    143 ticks,   0.143000 ms
+save_block (100 lines)                  284 ticks,   0.284000 ms
+save_block (20000 lines)              37378 ticks,  37.378000 ms
+remove_block (4 lines)                    1 ticks,   0.001000 ms
+remove_block (100 lines)                  8 ticks,   0.008000 ms
+remove_block (20000 lines)             1246 ticks,   1.246000 ms
+
+####################
+# SHARED - O0
+####################
+
+merge_files (4 lines)                   253 ticks,   0.253000 ms
+merge_files (100 lines)                 521 ticks,   0.521000 ms
+merge_files (20000 lines)             49680 ticks,  49.680000 ms
+save_block (4 lines)                    240 ticks,   0.240000 ms
+save_block (100 lines)                  296 ticks,   0.296000 ms
+save_block (20000 lines)              39084 ticks,  39.084000 ms
+remove_block (4 lines)                    1 ticks,   0.001000 ms
+remove_block (100 lines)                 10 ticks,   0.010000 ms
+remove_block (20000 lines)             1442 ticks,   1.442000 ms
+
+####################
+# DYNAMICALLY LOADED - O0
+####################
+
+merge_files (4 lines)                   259 ticks,   0.259000 ms
+merge_files (100 lines)                 493 ticks,   0.493000 ms
+merge_files (20000 lines)             51216 ticks,  51.216000 ms
+save_block (4 lines)                    162 ticks,   0.162000 ms
+save_block (100 lines)                  313 ticks,   0.313000 ms
+save_block (20000 lines)              39413 ticks,  39.413000 ms
+remove_block (4 lines)                    2 ticks,   0.002000 ms
+remove_block (100 lines)                  7 ticks,   0.007000 ms
+remove_block (20000 lines)             1232 ticks,   1.232000 ms
+
+####################
+# STATIC - O3
+####################
+
+merge_files (4 lines)                   268 ticks,   0.268000 ms
+merge_files (100 lines)                 475 ticks,   0.475000 ms
+merge_files (20000 lines)             50649 ticks,  50.649000 ms
+save_block (4 lines)                    156 ticks,   0.156000 ms
+save_block (100 lines)                  324 ticks,   0.324000 ms
+save_block (20000 lines)              41030 ticks,  41.030000 ms
+remove_block (4 lines)                    1 ticks,   0.001000 ms
+remove_block (100 lines)                  7 ticks,   0.007000 ms
+remove_block (20000 lines)             1168 ticks,   1.168000 ms
+
+####################
+# SHARED - O3
+####################
+
+merge_files (4 lines)                   305 ticks,   0.305000 ms
+merge_files (100 lines)                 516 ticks,   0.516000 ms
+merge_files (20000 lines)             48642 ticks,  48.642000 ms
+save_block (4 lines)                    148 ticks,   0.148000 ms
+save_block (100 lines)                  322 ticks,   0.322000 ms
+save_block (20000 lines)              45302 ticks,  45.302000 ms
+remove_block (4 lines)                    2 ticks,   0.002000 ms
+remove_block (100 lines)                  8 ticks,   0.008000 ms
+remove_block (20000 lines)             1262 ticks,   1.262000 ms
+
+####################
+# DYNAMICALLY LOADED - O3
+####################
+
+merge_files (4 lines)                   233 ticks,   0.233000 ms
+merge_files (100 lines)                 664 ticks,   0.664000 ms
+merge_files (20000 lines)             54855 ticks,  54.855000 ms
+save_block (4 lines)                    158 ticks,   0.158000 ms
+save_block (100 lines)                  351 ticks,   0.351000 ms
+save_block (20000 lines)              39907 ticks,  39.907000 ms
+remove_block (4 lines)                    2 ticks,   0.002000 ms
+remove_block (100 lines)                  7 ticks,   0.007000 ms
+remove_block (20000 lines)             1173 ticks,   1.173000 ms
+
+####################
+# STATIC - O2
+####################
+
+merge_files (4 lines)                   547 ticks,   0.547000 ms
+merge_files (100 lines)                 597 ticks,   0.597000 ms
+merge_files (20000 lines)             54261 ticks,  54.261000 ms
+save_block (4 lines)                    185 ticks,   0.185000 ms
+save_block (100 lines)                  327 ticks,   0.327000 ms
+save_block (20000 lines)              40649 ticks,  40.649000 ms
+remove_block (4 lines)                    1 ticks,   0.001000 ms
+remove_block (100 lines)                  8 ticks,   0.008000 ms
+remove_block (20000 lines)             1138 ticks,   1.138000 ms
+
+####################
+# SHARED - O2
+####################
+
+merge_files (4 lines)                   259 ticks,   0.259000 ms
+merge_files (100 lines)                 635 ticks,   0.635000 ms
+merge_files (20000 lines)             50252 ticks,  50.252000 ms
+save_block (4 lines)                    142 ticks,   0.142000 ms
+save_block (100 lines)                  297 ticks,   0.297000 ms
+save_block (20000 lines)              38090 ticks,  38.090000 ms
+remove_block (4 lines)                    1 ticks,   0.001000 ms
+remove_block (100 lines)                  9 ticks,   0.009000 ms
+remove_block (20000 lines)             1183 ticks,   1.183000 ms
+
+####################
+# SHARED - O2
+####################
+
+merge_files (4 lines)                   259 ticks,   0.259000 ms
+merge_files (100 lines)                 635 ticks,   0.635000 ms
+merge_files (20000 lines)             50252 ticks,  50.252000 ms
+save_block (4 lines)                    142 ticks,   0.142000 ms
+save_block (100 lines)                  297 ticks,   0.297000 ms
+save_block (20000 lines)              38090 ticks,  38.090000 ms
+remove_block (4 lines)                    1 ticks,   0.001000 ms
+remove_block (100 lines)                  9 ticks,   0.009000 ms
+remove_block (20000 lines)             1183 ticks,   1.183000 ms
+
+####################
+# DYNAMICALLY LOADED - O2
+####################
+
+merge_files (4 lines)                   240 ticks,   0.240000 ms
+merge_files (100 lines)                 451 ticks,   0.451000 ms
+merge_files (20000 lines)             53185 ticks,  53.185000 ms
+save_block (4 lines)                    188 ticks,   0.188000 ms
+save_block (100 lines)                  316 ticks,   0.316000 ms
+save_block (20000 lines)              40809 ticks,  40.809000 ms
+remove_block (4 lines)                    2 ticks,   0.002000 ms
+remove_block (100 lines)                  7 ticks,   0.007000 ms
+remove_block (20000 lines)             1196 ticks,   1.196000 ms
+
+####################
+# STATIC - Os
+####################
+
+merge_files (4 lines)                   236 ticks,   0.236000 ms
+merge_files (100 lines)                 431 ticks,   0.431000 ms
+merge_files (20000 lines)             47561 ticks,  47.561000 ms
+save_block (4 lines)                    148 ticks,   0.148000 ms
+save_block (100 lines)                  310 ticks,   0.310000 ms
+save_block (20000 lines)              36819 ticks,  36.819000 ms
+remove_block (4 lines)                    2 ticks,   0.002000 ms
+remove_block (100 lines)                  7 ticks,   0.007000 ms
+remove_block (20000 lines)             1101 ticks,   1.101000 ms
+
+####################
+# SHARED - Os
+####################
+
+merge_files (4 lines)                   249 ticks,   0.249000 ms
+merge_files (100 lines)                 444 ticks,   0.444000 ms
+merge_files (20000 lines)             50669 ticks,  50.669000 ms
+save_block (4 lines)                    180 ticks,   0.180000 ms
+save_block (100 lines)                  353 ticks,   0.353000 ms
+save_block (20000 lines)              39021 ticks,  39.021000 ms
+remove_block (4 lines)                    2 ticks,   0.002000 ms
+remove_block (100 lines)                  7 ticks,   0.007000 ms
+remove_block (20000 lines)             1361 ticks,   1.361000 ms
+
+####################
+# DYNAMICALLY LOADED - Os
+####################
+
+merge_files (4 lines)                   234 ticks,   0.234000 ms
+merge_files (100 lines)                 436 ticks,   0.436000 ms
+merge_files (20000 lines)             46817 ticks,  46.817000 ms
+save_block (4 lines)                    183 ticks,   0.183000 ms
+save_block (100 lines)                  314 ticks,   0.314000 ms
+save_block (20000 lines)              37661 ticks,  37.661000 ms
+remove_block (4 lines)                    1 ticks,   0.001000 ms
+remove_block (100 lines)                  8 ticks,   0.008000 ms
+remove_block (20000 lines)             1242 ticks,   1.242000 ms
+
+####################
+
+Wyniki nie różnią się znacząco, oprócz kombinacji "STATIC - Os", gdzie wyniki są najlepsze.

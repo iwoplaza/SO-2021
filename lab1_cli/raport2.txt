@@ -1,0 +1,9 @@
+merge_files (4 lines)                   547 ticks,   0.547000 ms
+merge_files (100 lines)                 597 ticks,   0.597000 ms
+merge_files (20000 lines)             54261 ticks,  54.261000 ms
+save_block (4 lines)                    185 ticks,   0.185000 ms
+save_block (100 lines)                  327 ticks,   0.327000 ms
+save_block (20000 lines)              40649 ticks,  40.649000 ms
+remove_block (4 lines)                    1 ticks,   0.001000 ms
+remove_block (100 lines)                  8 ticks,   0.008000 ms
+remove_block (20000 lines)             1138 ticks,   1.138000 ms
