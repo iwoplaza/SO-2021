@@ -1,0 +1,8 @@
+4 * 20000 lines
+TIME: merge_files          (real) 870.000000 ms, (user) 220.000000 ms, (system) 600.000000 ms
+
+16 * 20000 lines
+TIME: merge_files          (real) 21130.000000 ms, (user) 4720.000000 ms, (system) 11880.000000 ms
+
+32 * 20000 lines
+TIME: merge_files          (real) 58380.000000 ms, (user) 10420.000000 ms, (system) 23590.000000 ms

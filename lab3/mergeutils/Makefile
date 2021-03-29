@@ -1,8 +1,8 @@
 # We specify what kind of extensions we want to clean up
 CLEAN_EXTS = o a
 SRC_FILES = ../src/mergeutils.c
-OUTPUT_FILE_STATIC  = out/static/mergeutils.a
-OUTPUT_FILE_DYNAMIC = out/dynamic/mergeutils.so
+OUTPUT_FILE_STATIC  = out/static/libmergeutils.a
+OUTPUT_FILE_DYNAMIC = out/dynamic/libmergeutils.so
 
 #DEBUG_FLAGS =  -ggdb
 

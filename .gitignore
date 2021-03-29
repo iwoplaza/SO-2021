@@ -1,3 +1,4 @@
 prepared_packages/
 **/.idea/
 **/cmake-build-debug/
+**/cmake-build-release/
