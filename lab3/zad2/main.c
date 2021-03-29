@@ -9,6 +9,7 @@
 #include <sys/times.h>
 
 //#define WRITE_TO_FILE
+#define REMOVE_FROM_MEMORY
 
 void print_time(FILE* report_file, const char* label, clock_t clock_delta, clock_t user_delta, clock_t system_delta)
 {
@@ -56,6 +57,10 @@ bool merge_pair(const char* filename_a, const char* filename_b)
     char out_filename[256];
     sprintf(out_filename, "%d.txt", getpid());
     mu_write_block_to_file(table, mu_get_num_of_blocks(table) - 1, out_filename);
+    #endif
+
+    #ifdef REMOVE_FROM_MEMORY
+    mu_remove_block(table, 0);
     #endif
 
     mu_free_table(table);

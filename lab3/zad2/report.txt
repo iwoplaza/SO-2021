@@ -1,8 +1,53 @@
+4 * 4 lines
+merge                (real)  10.000000 ms, (user)   0.000000 ms, (system)   0.000000 ms
+merge + save         (real)  20.000000 ms, (user)   0.000000 ms, (system)   0.000000 ms
+merge + remove       (real)  10.000000 ms, (user)   0.000000 ms, (system)   0.000000 ms
+
+16 * 4 lines
+merge                (real)  30.000000 ms, (user)   0.000000 ms, (system)   0.000000 ms
+merge + save         (real) 870.000000 ms, (user)   0.000000 ms, (system)   0.000000 ms
+merge + remove       (real)  10.000000 ms, (user)   0.000000 ms, (system)   0.000000 ms
+
+32 * 4 lines
+merge                (real)  30.000000 ms, (user)   0.000000 ms, (system)   0.000000 ms
+merge + save         (real) 970.000000 ms, (user)  10.000000 ms, (system)   0.000000 ms
+merge + remove       (real)  10.000000 ms, (user)   0.000000 ms, (system)   0.000000 ms
+
+4 * 100 lines
+merge                (real)  10.000000 ms, (user)   0.000000 ms, (system)   0.000000 ms
+merge + save         (real)  30.000000 ms, (user)   0.000000 ms, (system)   0.000000 ms
+merge + remove       (real)  10.000000 ms, (user)   0.000000 ms, (system)   0.000000 ms
+
+16 * 100 lines
+merge                (real)  30.000000 ms, (user)   0.000000 ms, (system)   0.000000 ms
+merge + save         (real) 200.000000 ms, (user)   0.000000 ms, (system)   0.000000 ms
+merge + remove       (real)  20.000000 ms, (user)   0.000000 ms, (system)   0.000000 ms
+
+32 * 100 lines
+merge                (real)  30.000000 ms, (user)  10.000000 ms, (system)   0.000000 ms
+merge + save         (real) 220.000000 ms, (user)  20.000000 ms, (system)   0.000000 ms
+merge + remove       (real)  30.000000 ms, (user)  10.000000 ms, (system)   0.000000 ms
+
 4 * 20000 lines
-TIME: merge_files          (real) 870.000000 ms, (user) 220.000000 ms, (system) 600.000000 ms
+merge                (real) 870.000000 ms, (user) 220.000000 ms, (system) 600.000000 ms
+merge + save         (real) 19710.000000 ms, (user) 1300.000000 ms, (system) 6230.000000 ms
+merge + remove       (real) 5300.000000 ms, (user) 1430.000000 ms, (system) 2440.000000 ms
 
 16 * 20000 lines
-TIME: merge_files          (real) 21130.000000 ms, (user) 4720.000000 ms, (system) 11880.000000 ms
+merge                (real) 21130.000000 ms, (user) 4720.000000 ms, (system) 11880.000000 ms
+merge + save         (real) 261530.000000 ms, (user) 6930.000000 ms, (system) 22310.000000 ms
+merge + remove       [system frozen]
 
 32 * 20000 lines
-TIME: merge_files          (real) 58380.000000 ms, (user) 10420.000000 ms, (system) 23590.000000 ms
+merge                (real) 58380.000000 ms, (user) 10420.000000 ms, (system) 23590.000000 ms
+merge + save         [system frozen]
+merge + remove       [system frozen]
+
+---------------------------------------------------------------------------------------------------
+Dla małej ilości wierszy, ilość par praktycznie nie wpływa na czas wykonania
+(czasami szybciej merguje więcej par niż mniej), za to dla dużej ilości wierszy, ilość par
+ma duży wpływ na wykonanie programu.
+
+Odziwo dla rozwiązania z wykorzystaniem podziału pracy na procesy potomne, czas wykonania jest ogólnie większy niż przy
+rozwiązaniu jedno-procesowym. Może to być związane z traceniem czasu na inicjalizację procesów potomnych/zmianę
+przydziału procesora.

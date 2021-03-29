@@ -1,10 +1,23 @@
+small:
+4 a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt
+
+16 a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt
+
+32 a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt
+
+medium:
+4 a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt
+
+16 a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt
+
+32 a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt a_m.txt:b_m.txt
+
+long:
 4 a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt
 
 16 a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt
 
-64 a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt
+32 a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt a_l.txt:a_l.txt
 
-
-4 a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt a_s.txt:b_s.txt
 
 1 a_s.txt:b_s.txt
