@@ -1,0 +1,6 @@
+Wnioski:
+ - Sygnał wysłany i zablokowany w procesie macierzystym nie jest widoczny jako oczekujący w procesie potomnym.
+ - Sygnał wysłany i zablokowany jest widoczny jako oczekujący w po wywołaniu 'exec'.
+ - Sygnał obsługiwany zaczyna być ignorowany po wywołaniu 'exec'.
+ - Sygnały ignorowane dalej są ignorowane po wywołaniu 'exec'.
+ - Ignorowanie sygnałów nie dodaje ich do listy oczekiwanych.
