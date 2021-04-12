@@ -1,0 +1,107 @@
+#include <stdio.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include "mode.h"
+#include "msg.h"
+
+const char* USAGE = "Usage: <catcher_pid> <signal_count> <KILL|SIGQUEUE|SIGRT>\n";
+
+bool waiting_for_responses = true;
+
+void send_messages(MessageSender_t sender, int catcher_pid, int amount)
+{
+    for (int i = 0; i < amount; ++i)
+    {
+        sender(catcher_pid, false, i);
+    }
+
+    sender(catcher_pid, true, amount);
+}
+
+void signal_handler(int sig, siginfo_t* info, void* ucontext)
+{
+    if (sig == SIGUSR2 || sig == SIGRTMIN + 1)
+    {
+        waiting_for_responses = false;
+        printf("Finished listening to signals. \n");
+        return;
+    }
+
+    printf("Got signal with id: %d\n", info->si_value.sival_int);
+}
+
+int get_regular_msg_id(enum Mode mode)
+{
+    return mode == MODE_SIGRT ? SIGRTMIN : SIGUSR1;
+}
+
+int get_finishing_msg_id(enum Mode mode)
+{
+    return mode == MODE_SIGRT ? SIGRTMIN + 1 : SIGUSR2;
+}
+
+int main(int argc, char** argv)
+{
+    printf("==SENDER==\n");
+    printf("==========\n\n");
+
+    if (argc != 4)
+    {
+        printf("%s", USAGE);
+        return 1;
+    }
+
+    int catcher_pid = atoi(argv[1]);
+    int signals_to_send = atoi(argv[2]);
+    enum Mode mode = parse_mode(argv[3]);
+
+    printf("Sending %d messages to %d (%s)\n", signals_to_send, catcher_pid, argv[3]);
+
+    MessageSender_t sender = NULL;
+    switch (mode)
+    {
+        case MODE_KILL:
+            sender = send_kill;
+            break;
+        case MODE_SIGQUEUE:
+            sender = send_sigqueue;
+            break;
+        case MODE_SIGRT:
+            sender = send_realtime;
+            break;
+        default:
+            break;
+    }
+
+    setup_sigaction(get_regular_msg_id(mode), signal_handler);
+    setup_sigaction(get_finishing_msg_id(mode), signal_handler);
+
+    send_messages(sender, catcher_pid, signals_to_send);
+
+    // Wait for responses.
+    sigset_t mask;
+    sigfillset(&mask);
+
+    switch (mode)
+    {
+        case MODE_KILL:
+        case MODE_SIGQUEUE:
+            sigdelset(&mask, SIGUSR1);
+            sigdelset(&mask, SIGUSR2);
+            break;
+        case MODE_SIGRT:
+            sigdelset(&mask, SIGRTMIN);
+            sigdelset(&mask, SIGRTMIN + 1);
+            break;
+        default:
+            break;
+    }
+
+    while (waiting_for_responses)
+    {
+        sigsuspend(&mask);
+    }
+
+    return 0;
+}
