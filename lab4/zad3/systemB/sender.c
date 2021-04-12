@@ -46,6 +46,14 @@ int main(int argc, char** argv)
     setup_sigaction(get_regular_msg_id(mode), signal_handler);
     setup_sigaction(get_finishing_msg_id(mode), signal_handler);
 
+    // This is the mask that will be used during normal execution.
+    // It's going to block every signal, meaning that there will
+    // be no signal handled between sending a signal, and setting up
+    // to wait for the response.
+    sigset_t default_mask;
+    sigfillset(&default_mask);
+    sigprocmask(SIG_SETMASK, &default_mask, NULL);
+
     sigset_t mask = setup_mask(mode);
 
     printf("Sending %d messages to %d\n", signals_to_send, catcher_pid);
