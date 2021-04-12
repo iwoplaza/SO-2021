@@ -11,16 +11,6 @@ pid_t sender_pid;
 bool waiting_for_responses = true;
 int signals_received = 0;
 
-void send_messages(MessageSender_t sender, int catcher_pid, int amount)
-{
-    for (int i = 0; i < amount; ++i)
-    {
-        sender(catcher_pid, false, i);
-    }
-
-    sender(catcher_pid, true, amount);
-}
-
 void signal_handler(int sig, siginfo_t* info, void* ucontext)
 {
     if (sig == SIGUSR2 || sig == SIGRTMIN + 1)
@@ -33,16 +23,6 @@ void signal_handler(int sig, siginfo_t* info, void* ucontext)
 
     printf("Got signal with id: %d\n", info->si_value.sival_int);
     signals_received++;
-}
-
-int get_regular_msg_id(enum Mode mode)
-{
-    return mode == MODE_SIGRT ? SIGRTMIN : SIGUSR1;
-}
-
-int get_finishing_msg_id(enum Mode mode)
-{
-    return mode == MODE_SIGRT ? SIGRTMIN + 1 : SIGUSR2;
 }
 
 int main(int argc, char** argv)
@@ -80,29 +60,14 @@ int main(int argc, char** argv)
     setup_sigaction(get_finishing_msg_id(mode), signal_handler);
 
     // Wait for responses.
-    sigset_t mask;
-    sigfillset(&mask);
-
-    switch (mode)
-    {
-        case MODE_KILL:
-        case MODE_SIGQUEUE:
-            sigdelset(&mask, SIGUSR1);
-            sigdelset(&mask, SIGUSR2);
-            break;
-        case MODE_SIGRT:
-            sigdelset(&mask, SIGRTMIN);
-            sigdelset(&mask, SIGRTMIN + 1);
-            break;
-        default:
-            break;
-    }
+    sigset_t mask = setup_mask(mode);
 
     while (waiting_for_responses)
     {
         sigsuspend(&mask);
     }
 
+    // Sending responses.
     send_messages(sender, sender_pid, signals_received);
 
     return 0;

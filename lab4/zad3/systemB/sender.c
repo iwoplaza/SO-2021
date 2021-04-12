@@ -7,21 +7,9 @@
 
 const char* USAGE = "Usage: <catcher_pid> <signal_count> <KILL|SIGQUEUE|SIGRT>\n";
 
-bool waiting_for_responses = true;
-int signals_to_send;
-int signals_received = 0;
-
 void signal_handler(int sig, siginfo_t* info, void* ucontext)
 {
-    if (sig == SIGUSR2 || sig == SIGRTMIN + 1)
-    {
-        waiting_for_responses = false;
-        printf("Finished listening to signals. Received %d out of %d expected.\n", signals_received, signals_to_send);
-        return;
-    }
-
-    signals_received++;
-    printf("Got signal with id: %d\n", info->si_value.sival_int);
+    printf("Got acknowledgment.\n");
 }
 
 int main(int argc, char** argv)
@@ -36,7 +24,7 @@ int main(int argc, char** argv)
     }
 
     int catcher_pid = atoi(argv[1]);
-    signals_to_send = atoi(argv[2]);
+    int signals_to_send = atoi(argv[2]);
     enum Mode mode = parse_mode(argv[3]);
 
     MessageSender_t sender = NULL;
@@ -58,15 +46,19 @@ int main(int argc, char** argv)
     setup_sigaction(get_regular_msg_id(mode), signal_handler);
     setup_sigaction(get_finishing_msg_id(mode), signal_handler);
 
-    send_messages(sender, catcher_pid, signals_to_send);
-
-    // Wait for responses.
     sigset_t mask = setup_mask(mode);
 
-    while (waiting_for_responses)
+    printf("Sending %d messages to %d\n", signals_to_send, catcher_pid);
+    for (int i = 0; i < signals_to_send; ++i)
     {
+        sender(catcher_pid, false, i);
+
+        // Wait for response.
         sigsuspend(&mask);
     }
+
+    // Sending last message
+    sender(catcher_pid, true, signals_to_send);
 
     return 0;
 }

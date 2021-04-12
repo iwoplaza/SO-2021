@@ -1,45 +1,50 @@
 #include <stdio.h>
 #include <signal.h>
-#include <stdlib.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include "mode.h"
 #include "msg.h"
 
-const char* USAGE = "Usage: <catcher_pid> <signal_count> <KILL|SIGQUEUE|SIGRT>\n";
+const char* USAGE = "Usage: <KILL|SIGQUEUE|SIGRT>\n";
 
+MessageSender_t sender = NULL;
 bool waiting_for_responses = true;
-int signals_to_send;
 int signals_received = 0;
 
 void signal_handler(int sig, siginfo_t* info, void* ucontext)
 {
+    int sender_pid = info->si_pid;
+
     if (sig == SIGUSR2 || sig == SIGRTMIN + 1)
     {
         waiting_for_responses = false;
-        printf("Finished listening to signals. Received %d out of %d expected.\n", signals_received, signals_to_send);
+        sender(sender_pid, true, signals_received);
+        printf("Finished listening to signals. Received %d total. \n", signals_received);
         return;
     }
 
-    signals_received++;
     printf("Got signal with id: %d\n", info->si_value.sival_int);
+    sender(sender_pid, false, signals_received);
+
+    signals_received++;
 }
 
 int main(int argc, char** argv)
 {
-    printf("==SENDER==\n");
+    printf("==CATCHER==\n");
     printf("==========\n\n");
 
-    if (argc != 4)
+    if (argc != 2)
     {
         printf("%s", USAGE);
         return 1;
     }
 
-    int catcher_pid = atoi(argv[1]);
-    signals_to_send = atoi(argv[2]);
-    enum Mode mode = parse_mode(argv[3]);
+    printf("PID: %d\n", getpid());
 
-    MessageSender_t sender = NULL;
+    enum Mode mode = parse_mode(argv[1]);
+
+    sender = NULL;
     switch (mode)
     {
         case MODE_KILL:
@@ -58,11 +63,10 @@ int main(int argc, char** argv)
     setup_sigaction(get_regular_msg_id(mode), signal_handler);
     setup_sigaction(get_finishing_msg_id(mode), signal_handler);
 
-    send_messages(sender, catcher_pid, signals_to_send);
-
-    // Wait for responses.
+    // Wait for messages.
     sigset_t mask = setup_mask(mode);
 
+    printf("Waiting for signals...");
     while (waiting_for_responses)
     {
         sigsuspend(&mask);

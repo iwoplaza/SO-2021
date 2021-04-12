@@ -1,3 +1,5 @@
-KILL:       1242/10000
-SIGQUEUE:   1739/10000
-REALTIME:
+KILL:       Sender: 1000000 -> Catcher: 93166   -> Sender: 8911
+SIGQUEUE:   Sender: 1000000 -> Catcher: 191018  -> Sender: 35722
+SIGRT:      Pomimo teorytycznego priorytetyzującego kolejkowania FIFO, sygnał o numerze SIGRTMIN+1 jest
+            obsługiwany wcześniej niż reszta sygnałów o numerach SIGRTMIN. Wynikowo ilością przesłanych
+            wiadomości jest 0.
