@@ -3,7 +3,7 @@
 
 #define MIN_BUFFER 32
 
-const char* read_string(FILE* file_handle)
+const char* read_string(FILE* file_handle, bool* end_of_line)
 {
     int buffer_size = MIN_BUFFER;
     char* buffer = malloc(buffer_size * sizeof(char));
@@ -15,6 +15,9 @@ const char* read_string(FILE* file_handle)
         printf("%c", ch);
 
         if (ch == '\n' || ch == ' ') {
+            if (end_of_line != NULL)
+                *end_of_line = ch == '\n';
+
             break;
         }
 

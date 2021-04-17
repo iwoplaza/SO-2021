@@ -1,33 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
 
-typedef struct Argument_t {
-    const char* value;
-    const struct Argument_t* next;
-} Argument_t;
-
-typedef struct Command_t {
-    const char* command_name;
-    const Argument_t* argument_head;
-    const struct Command_t* pipes_to;
-} Command_t;
-
-typedef struct Component_t {
-    const Command_t* command;
-} Component_t;
-
-
-Component_t* components;
-
-void parse_component_line(const char* line)
-{
-
-}
-
-void parse_file(FILE* file_handle)
-{
-    const char* line = read_string();
-}
 
 int main(int argc, char **argv)
 {
