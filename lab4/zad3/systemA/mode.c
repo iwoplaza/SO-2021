@@ -38,8 +38,6 @@ sigset_t setup_mask(enum Mode mode)
     sigset_t mask;
     sigfillset(&mask);
 
-    sigdelset(&mask, SIGKILL);
-    sigdelset(&mask, SIGSTOP);
     sigdelset(&mask, get_regular_msg_id(mode));
     sigdelset(&mask, get_finishing_msg_id(mode));
 
