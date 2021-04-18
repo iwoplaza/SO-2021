@@ -49,14 +49,16 @@ Command_t* parse_command(InstructionSet_t* set, const Token_t** curr)
     // Retrieving the command name.
     command->command_name = malloc(strlen((*curr)->value) + 1);
     strcpy(command->command_name, (*curr)->value);
-    *curr = (*curr)->next;
 
     // Retrieving the amount of arguments we need.
-    command->arguments_amount = find_argument_amount(*curr) + 2;
+    command->arguments_amount = find_argument_amount(*curr) + 1;
 
     // Making space for the command name at the front, and the NULL on the back.
     char** arguments = malloc((command->arguments_amount) * sizeof(char*));
     arguments[0] = command->command_name;
+
+    // Skipping past the command name.
+    *curr = (*curr)->next;
 
     for (int i = 1; i < command->arguments_amount - 1; ++i)
     {
@@ -105,6 +107,12 @@ void parse_definition(InstructionSet_t* set, const Token_t** curr)
         {
             command_tail->pipes_to = command_curr;
             command_tail = command_curr;
+        }
+
+        // Skipping a pipe.
+        if ((*curr) != NULL && strcmp((*curr)->value, "|") == 0)
+        {
+            *curr = (*curr)->next;
         }
     }
 
@@ -300,7 +308,7 @@ void print_component(Command_t* command)
 
         if (command != NULL)
         {
-            printf(" | ");
+            printf(" |");
         }
     }
 
@@ -319,7 +327,7 @@ void print_job(PipeJobEntry_t* job)
 
         if (job != NULL)
         {
-            printf(" | ");
+            printf(" |");
         }
     }
 
