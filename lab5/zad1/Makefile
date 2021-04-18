@@ -2,7 +2,7 @@
 CLEAN_EXTS = o a
 SRC_FILES = src/main.c src/utils.c src/lang.c
 
-OPTIMIZATION = -O2
+#OPTIMIZATION = -O2
 
 COMMON_ARGS = -o bin/zad1 -Wall -I. $(OPTIMIZATION) $(SRC_FILES)
 

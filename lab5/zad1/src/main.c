@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
-
+#include "lang.h"
 
 int main(int argc, char **argv)
 {
@@ -16,8 +16,26 @@ int main(int argc, char **argv)
 
     const char* filepath = argv[1];
 
-    execlp("ls --help", "ls");
+    FILE* file = fopen(filepath, "r");
 
+    if (file == NULL)
+    {
+        printf("Failed to open file: '%s'\n", filepath);
+        return 1;
+    }
+
+    InstructionSet_t* set = init_instruction_set();
+
+    parse_file(set, file);
+
+    if (set->parse_status != PARSE_SUCCESS)
+    {
+        fprintf(stderr, "[Parsing error | Line %d]: %s\n", set->error_loc, set->error_message);
+        fclose(file);
+        return 1;
+    }
+
+    fclose(file);
 
     return 0;
 }
