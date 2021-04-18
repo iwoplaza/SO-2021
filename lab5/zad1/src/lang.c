@@ -280,3 +280,64 @@ void free_instruction_set(InstructionSet_t* set)
     }
     free(set->jobs);
 }
+
+/*
+ * PRINTING
+ */
+
+void print_component(Command_t* command)
+{
+    printf("\t(%#08x)", (unsigned int) command);
+
+    while (command != NULL)
+    {
+        for (int i = 0; i < command->arguments_amount - 1; ++i)
+        {
+            printf(" %s", command->arguments[i]);
+        }
+
+        command = command->pipes_to;
+
+        if (command != NULL)
+        {
+            printf(" | ");
+        }
+    }
+
+    printf("\n");
+}
+
+void print_job(PipeJobEntry_t* job)
+{
+    printf("\t");
+
+    while (job != NULL)
+    {
+        printf(" %#08x", (unsigned int) job->command);
+
+        job = job->next;
+
+        if (job != NULL)
+        {
+            printf(" | ");
+        }
+    }
+
+    printf("\n");
+}
+
+void print_instruction_set(InstructionSet_t* set)
+{
+    printf("COMPONENTS:\n");
+    for (int i = 0; i < set->components_amount; ++i)
+    {
+        print_component(set->components[i]);
+    }
+
+    printf("\n");
+    printf("JOBS:\n");
+    for (int i = 0; i < set->jobs_amount; ++i)
+    {
+        print_job(set->jobs[i]);
+    }
+}

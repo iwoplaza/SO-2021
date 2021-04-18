@@ -36,5 +36,6 @@ typedef struct InstructionSet_t {
 InstructionSet_t* init_instruction_set();
 void parse_file(InstructionSet_t* set, FILE* file_handle);
 void free_instruction_set(InstructionSet_t* set);
+void print_instruction_set(InstructionSet_t* set);
 
 #endif //ZAD1_LANG_H

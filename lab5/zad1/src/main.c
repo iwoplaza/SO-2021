@@ -32,10 +32,14 @@ int main(int argc, char **argv)
     {
         fprintf(stderr, "[Parsing error | Line %d]: %s\n", set->error_loc, set->error_message);
         fclose(file);
+        free_instruction_set(set);
         return 1;
     }
 
+    print_instruction_set(set);
+
     fclose(file);
+    free_instruction_set(set);
 
     return 0;
 }
