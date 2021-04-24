@@ -97,39 +97,55 @@ Aggregate_t* read_aggregate(FILE* file)
 
     while ((data_size = fread(buffer, sizeof(char), BUFFER_SIZE, file)) > 0)
     {
-        printf("Read %d bytes from file.\n", data_size);
-
         int data_idx = 0;
 
         while (data_idx < data_size)
         {
-            int line_data_size = data_size - data_idx;
-
             char* endline_ptr = strchr(buffer + data_idx, '\n');
             if (endline_ptr != NULL)
             {
                 // We've reached an end of line.
                 int line_data_size = endline_ptr - (buffer + data_idx);
-                aggregate_add_data(aggregate, line_idx, buffer, line_data_size);
+                aggregate_add_data(aggregate, line_idx, buffer + data_idx, line_data_size);
+
+                // Passing by the newline
+                data_idx += line_data_size + 1;
 
                 line_idx++;
             }
             else
             {
-                // We're continuing to read the line.
-                aggregate_add_data(aggregate, line_idx, buffer, line_data_size);
-            }
+                int line_data_size = data_size - data_idx;
 
-            data_idx += line_data_size;
+                // We're continuing to read the line.
+                aggregate_add_data(aggregate, line_idx, buffer + data_idx, line_data_size);
+
+                data_idx += line_data_size;
+            }
         }
     }
 
     return aggregate;
 }
 
-void write_aggregate(FILE* file)
+void write_aggregate(Aggregate_t* aggregate, FILE* file)
 {
+    for (int i = 0; i < aggregate->count; ++i)
+    {
+        // Making sure the lines end with '\0'.
+        aggregate->lines[i].value[aggregate->lines[i].count] = '\0';
+        fprintf(file, "%s\n", aggregate->lines[i].value);
+    }
+}
 
+void print_aggregate(Aggregate_t* aggregate)
+{
+    for (int i = 0; i < aggregate->count; ++i)
+    {
+        // Making sure the lines end with '\0'.
+        aggregate->lines[i].value[aggregate->lines[i].count] = '\0';
+        printf("%s\n", aggregate->lines[i].value);
+    }
 }
 
 void free_aggregate(Aggregate_t* aggregate)
@@ -152,15 +168,20 @@ int main(int argc, char** argv)
     printf("=== CONSUMER ===\n");
     printf("Reading from '%s', '%d' elements per batch to '%s'.\n\n", args.pipe_path, args.batch_size, args.output_filepath);
 
-    FILE* output_file = open_resource("output file", args.output_filepath, "rw");
+    FILE* output_file = open_resource("output file", args.output_filepath, "r+");
 
     Aggregate_t* aggregate = read_aggregate(output_file);
 
-    FILE* pipe = open_resource("FIFO", args.pipe_path, "r");
+    aggregate_add_data(aggregate, 0, "Bruh", 4);
+    print_aggregate(aggregate);
+
+    write_aggregate(aggregate, output_file);
+
+//    FILE* pipe = open_resource("FIFO", args.pipe_path, "r");
 
     // Freeing all resources.
     free_aggregate(aggregate);
-    fclose(pipe);
+//    fclose(pipe);
     fclose(output_file);
 
     return 0;
