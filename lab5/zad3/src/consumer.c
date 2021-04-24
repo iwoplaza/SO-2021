@@ -3,7 +3,6 @@
 #include <string.h>
 #include <sys/file.h>
 #include <unistd.h>
-#include <stdbool.h>
 #include "utils.h"
 #define BUFFER_SIZE 128
 
@@ -136,6 +135,7 @@ void write_aggregate(Aggregate_t* aggregate, int file)
     {
         // Making sure the lines end with '\n'.
         char* print_buffer = malloc(sizeof(char) * (aggregate->lines[i].count + 1));
+        memcpy(print_buffer, aggregate->lines[i].value, aggregate->lines[i].count);
         print_buffer[aggregate->lines[i].count] = '\n';
 
         write(file, print_buffer, aggregate->lines[i].count + 1);
@@ -192,6 +192,19 @@ size_t read_pipe(FILE* pipe, int batch_size, char* data_buffer, int* line_idx)
     return fread(data_buffer, sizeof(char), batch_size, pipe);
 }
 
+size_t get_actual_data_size(const char* buffer, size_t data_size)
+{
+    for (int i = 0; i < data_size; ++i)
+    {
+        if (buffer[i] == '\0')
+        {
+            return i;
+        }
+    }
+
+    return data_size;
+}
+
 int main(int argc, char** argv)
 {
     Args_t args;
@@ -227,7 +240,7 @@ int main(int argc, char** argv)
         close(input_file);
 
         // Adding new content to the aggregate
-        aggregate_add_data(aggregate, line_idx, buffer, data_size);
+        aggregate_add_data(aggregate, line_idx, buffer, get_actual_data_size(buffer, data_size));
 
         // Saving the new contents
         int output_file = open_resource("output file", args.output_filepath, O_WRONLY|O_TRUNC, 0);

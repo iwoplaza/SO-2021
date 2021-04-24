@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include "utils.h"
 
 const char* USAGE = "<pipe> <id> <input> <batch_size>";
@@ -47,8 +48,8 @@ void read_and_validate_args(int argc, char** argv, Args_t* args_out)
 
 void send_to_pipe(FILE* pipe, int producer_id, char* data, int batch_size)
 {
-    // Sending the producer id.
-    fprintf(pipe, "%d", producer_id);
+    // Sending the producer id, then a space before the upcoming data.
+    fprintf(pipe, "%d ", producer_id);
 
     // Sending the data
     // Note that the actual data might be smaller in size than the batch size,
@@ -58,6 +59,12 @@ void send_to_pipe(FILE* pipe, int producer_id, char* data, int batch_size)
     fwrite(data, sizeof(char), batch_size, pipe);
 }
 
+float randf()
+{
+    
+    return (float) rand() / (float) (RAND_MAX);
+}
+
 int main(int argc, char** argv)
 {
     Args_t args;
@@ -65,7 +72,7 @@ int main(int argc, char** argv)
 
     // Greeting message
     printf("=== PRODUCER [%d] ===\n", args.producer_id);
-    printf("Reading from '%s', '%d' elements per batch to '%s'.\n\n", args.input_filepath, args.batch_size, args.pipe_path);
+    printf("[%d] Reading from '%s', '%d' elements per batch to '%s'.\n\n", args.producer_id, args.input_filepath, args.batch_size, args.pipe_path);
 
     FILE* pipe = open_resource_std("FIFO", args.pipe_path, "w");
     FILE* data_file = open_resource_std("data file", args.input_filepath, "r");
@@ -79,6 +86,9 @@ int main(int argc, char** argv)
         data_buffer[len_read + 1] = '\0';
         printf("%s\n", data_buffer);
         send_to_pipe(pipe, args.producer_id, data_buffer, args.batch_size);
+
+        // Waiting for a random amount of seconds between 1-2s.
+        sleep(1 + randf());
     }
 
     // Freeing all resources.

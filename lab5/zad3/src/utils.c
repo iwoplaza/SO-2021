@@ -28,10 +28,6 @@ FILE* open_resource_std(const char* res_name, const char* path, const char* mode
         fprintf(stderr, "Couldn't open %s: %s\n", res_name, path);
         exit(1);
     }
-    else
-    {
-        printf("Opened %s successfully.\n", res_name);
-    }
 
     return resource;
 }
