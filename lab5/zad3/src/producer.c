@@ -61,7 +61,6 @@ void send_to_pipe(FILE* pipe, int producer_id, char* data, int batch_size)
 
 float randf()
 {
-    
     return (float) rand() / (float) (RAND_MAX);
 }
 
@@ -83,7 +82,8 @@ int main(int argc, char** argv)
     size_t len_read;
     while ((len_read = fread(data_buffer, sizeof(char), args.batch_size, data_file)) > 0)
     {
-        data_buffer[len_read + 1] = '\0';
+        data_buffer[len_read] = '\0';
+
         printf("%s\n", data_buffer);
         send_to_pipe(pipe, args.producer_id, data_buffer, args.batch_size);
 

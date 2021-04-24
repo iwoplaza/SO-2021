@@ -4,7 +4,7 @@
 #include <sys/file.h>
 #include <unistd.h>
 #include "utils.h"
-#define BUFFER_SIZE 128
+#include "aggregate.h"
 
 const char* USAGE = "<pipe> <output> <batch_size>";
 
@@ -31,138 +31,6 @@ void read_and_validate_args(int argc, char** argv, Args_t* args_out)
         fprintf(stderr, "[INVALID ARG]: The batch size has to be at least 1.\n");
         exit(1);
     }
-}
-
-typedef struct AggregateLine_t {
-    char* value;
-    int capacity;
-    int count;
-} AggregateLine_t;
-
-typedef struct Aggregate_t {
-    AggregateLine_t* lines;
-    int capacity;
-    int count;
-} Aggregate_t;
-
-void aggregate_add_line(Aggregate_t* aggregate)
-{
-    AggregateLine_t* line = &aggregate->lines[aggregate->count];
-    line->capacity = 32;
-    line->value = malloc(line->capacity);
-    line->count = 0;
-
-    aggregate->count++;
-
-    if (aggregate->count >= aggregate->capacity)
-    {
-        aggregate->capacity += 16;
-        aggregate->lines = realloc(aggregate->lines, sizeof(AggregateLine_t) * aggregate->capacity);
-    }
-}
-
-void aggregate_add_data(Aggregate_t* aggregate, int line_idx, char* data, int data_size)
-{
-    // While the last index in the aggregate is smaller than the line idx.
-    while (aggregate->count - 1 < line_idx)
-    {
-        aggregate_add_line(aggregate);
-    }
-
-    AggregateLine_t* line = &aggregate->lines[line_idx];
-    
-    // We account for the future '\0' symbol.
-    int min_capacity = line->count + data_size + 1;
-    if (line->capacity < min_capacity)
-    {
-        // Readjusting the capacity
-        line->capacity = min_capacity;
-        line->value = realloc(line->value, sizeof(char) * line->capacity);
-    }
-
-    memcpy(line->value + line->count, data, data_size);
-    line->count += data_size;
-}
-
-Aggregate_t* read_aggregate(int file)
-{
-    char buffer[BUFFER_SIZE];
-    int data_size = 0;
-
-    Aggregate_t* aggregate = malloc(sizeof(Aggregate_t));
-    aggregate->capacity = 16;
-    aggregate->lines = malloc(sizeof(AggregateLine_t) * aggregate->capacity);
-    aggregate->count = 0;
-
-    int line_idx = 0;
-
-    while ((data_size = read(file, buffer, BUFFER_SIZE)) > 0)
-    {
-        int data_idx = 0;
-
-        while (data_idx < data_size)
-        {
-            char* endline_ptr = strchr(buffer + data_idx, '\n');
-            if (endline_ptr != NULL)
-            {
-                // We've reached an end of line.
-                int line_data_size = endline_ptr - (buffer + data_idx);
-                aggregate_add_data(aggregate, line_idx, buffer + data_idx, line_data_size);
-
-                // Passing by the newline
-                data_idx += line_data_size + 1;
-
-                line_idx++;
-            }
-            else
-            {
-                int line_data_size = data_size - data_idx;
-
-                // We're continuing to read the line.
-                aggregate_add_data(aggregate, line_idx, buffer + data_idx, line_data_size);
-
-                data_idx += line_data_size;
-            }
-        }
-    }
-
-    return aggregate;
-}
-
-void write_aggregate(Aggregate_t* aggregate, int file)
-{
-    for (int i = 0; i < aggregate->count; ++i)
-    {
-        // Making sure the lines end with '\n'.
-        char* print_buffer = malloc(sizeof(char) * (aggregate->lines[i].count + 1));
-        memcpy(print_buffer, aggregate->lines[i].value, aggregate->lines[i].count);
-        print_buffer[aggregate->lines[i].count] = '\n';
-
-        write(file, print_buffer, aggregate->lines[i].count + 1);
-
-        free(print_buffer);
-    }
-}
-
-void print_aggregate(Aggregate_t* aggregate)
-{
-    for (int i = 0; i < aggregate->count; ++i)
-    {
-        // Making sure the lines end with '\0'.
-        aggregate->lines[i].value[aggregate->lines[i].count] = '\0';
-        printf("%s\n", aggregate->lines[i].value);
-    }
-}
-
-void free_aggregate(Aggregate_t* aggregate)
-{
-    for (int i = 0; i < aggregate->count; ++i)
-    {
-        free(aggregate->lines[i].value);
-    }
-    free(aggregate->lines);
-
-    free(aggregate);
 }
 
 size_t read_pipe(FILE* pipe, int batch_size, char* data_buffer, int* line_idx)
