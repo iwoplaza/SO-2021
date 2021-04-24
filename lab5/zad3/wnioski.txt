@@ -1,0 +1,11 @@
+Wartością PIPE_BUF dla mojego systemu jest 4096, więc jako N przyjąłem kolejno 5, 1000 i 5000.
+Sytuację: P producentów produkuje dla K konsumentów w B partiach oznaczam jako [B] P => K.
+
+Sytuacje [5/1000] 1/5 => 1 są stabilne, ponieważ system gwarantuje atomowość operacji zapisu.
+Jeśli zwiększylibyśmy liczbę konsumentów, atomiczność nie byłaby zagrawantowana.
+
+W sytuacjach [5/1000] 1/5 => 5 zauważyłem niestabilność, gdzie nie wszystkie dane są przechwycone.
+Jest to zapewne spowodowane zwiększoną ilością konsumentów.
+
+W sytuacjach [5000] 1/5 => 1/5 przekroczyliśmy wartość PIPE_BUF co nie gwarantuje nam atomowości
+operacji zapisu. Powoduje to błędy formatu przesyłu, gdzie części pakietów się przeplatają.

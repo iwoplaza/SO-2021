@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <wait.h>
 #include <fcntl.h>
+#include <limits.h>
 #include "aggregate.h"
 
 const char* USAGE = "<producers> <consumers> <pipe> <output> <batch_size>";
@@ -62,6 +63,8 @@ bool test_integrity(const Args_t* args)
         int in_fd = open(input_file, O_RDONLY);
         Aggregate_t* data_aggregate = read_aggregate(in_fd);
 
+//        print_aggregate(data_aggregate);
+
         if (data_aggregate->count == 0 || cmp_aggregate_line(aggregate, i, data_aggregate->lines[0].value) == false)
         {
             free_aggregate(data_aggregate);
@@ -78,6 +81,8 @@ bool test_integrity(const Args_t* args)
 
 int main(int argc, char** argv)
 {
+    printf("PIPE BUFFER SIZE: %d\n", PIPE_BUF);
+
     Args_t args;
     read_and_validate_args(argc, argv, &args);
 
@@ -92,8 +97,6 @@ int main(int argc, char** argv)
             create_consumer(&args);
             return 0;
         }
-
-        printf("Created customer %d.\n", i);
     }
 
     for (int i = 0; i < args.producers; ++i)
@@ -104,8 +107,6 @@ int main(int argc, char** argv)
             create_producer(&args, i);
             return 0;
         }
-
-        printf("Created producer %d.\n", i);
     }
 
     // Waiting for child processes to end.
@@ -117,10 +118,10 @@ int main(int argc, char** argv)
 
     if (test_integrity(&args))
     {
-        printf("OK\n");
+        printf("OK\n\n");
     }
     else
     {
-        printf("BAD OUTPUT\n");
+        printf("BAD OUTPUT\n\n");
     }
 }
