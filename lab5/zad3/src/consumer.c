@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
+#include <sys/file.h>
+#include <unistd.h>
+#include <stdbool.h>
 #include "utils.h"
 #define BUFFER_SIZE 128
 
@@ -83,7 +85,7 @@ void aggregate_add_data(Aggregate_t* aggregate, int line_idx, char* data, int da
     line->count += data_size;
 }
 
-Aggregate_t* read_aggregate(FILE* file)
+Aggregate_t* read_aggregate(int file)
 {
     char buffer[BUFFER_SIZE];
     int data_size = 0;
@@ -95,7 +97,7 @@ Aggregate_t* read_aggregate(FILE* file)
 
     int line_idx = 0;
 
-    while ((data_size = fread(buffer, sizeof(char), BUFFER_SIZE, file)) > 0)
+    while ((data_size = read(file, buffer, BUFFER_SIZE)) > 0)
     {
         int data_idx = 0;
 
@@ -128,13 +130,17 @@ Aggregate_t* read_aggregate(FILE* file)
     return aggregate;
 }
 
-void write_aggregate(Aggregate_t* aggregate, FILE* file)
+void write_aggregate(Aggregate_t* aggregate, int file)
 {
     for (int i = 0; i < aggregate->count; ++i)
     {
-        // Making sure the lines end with '\0'.
-        aggregate->lines[i].value[aggregate->lines[i].count] = '\0';
-        fprintf(file, "%s\n", aggregate->lines[i].value);
+        // Making sure the lines end with '\n'.
+        char* print_buffer = malloc(sizeof(char) * (aggregate->lines[i].count + 1));
+        print_buffer[aggregate->lines[i].count] = '\n';
+
+        write(file, print_buffer, aggregate->lines[i].count + 1);
+
+        free(print_buffer);
     }
 }
 
@@ -159,6 +165,33 @@ void free_aggregate(Aggregate_t* aggregate)
     free(aggregate);
 }
 
+size_t read_pipe(FILE* pipe, int batch_size, char* data_buffer, int* line_idx)
+{
+    char buffer;
+
+    *line_idx = 0;
+
+    // Reading the line idx.
+    while (fread(&buffer, sizeof(char), 1, pipe) > 0)
+    {
+        if (buffer == ' ')
+        {
+            break;
+        }
+
+        if (buffer < '0' || buffer > '9')
+        {
+            fprintf(stderr, "Received an invalid producer index, expected a digit, got '%c'\n", buffer);
+            exit(1);
+        }
+
+        // Multiplying the previous digit by 10, adding a new digit.
+        *line_idx = 10 * (*line_idx) + (buffer - '0');
+    }
+
+    return fread(data_buffer, sizeof(char), batch_size, pipe);
+}
+
 int main(int argc, char** argv)
 {
     Args_t args;
@@ -168,21 +201,49 @@ int main(int argc, char** argv)
     printf("=== CONSUMER ===\n");
     printf("Reading from '%s', '%d' elements per batch to '%s'.\n\n", args.pipe_path, args.batch_size, args.output_filepath);
 
-    FILE* output_file = open_resource("output file", args.output_filepath, "r+");
+    FILE* pipe = open_resource_std("FIFO", args.pipe_path, "r");
 
-    Aggregate_t* aggregate = read_aggregate(output_file);
+    char* buffer = malloc(sizeof(char) * args.batch_size);
+    size_t data_size = 0;
 
-    aggregate_add_data(aggregate, 0, "Bruh", 4);
-    print_aggregate(aggregate);
+    int line_idx = 0;
 
-    write_aggregate(aggregate, output_file);
+    while ((data_size = read_pipe(pipe, args.batch_size, buffer, &line_idx)) > 0)
+    {
+        if (data_size != args.batch_size)
+        {
+            fprintf(stderr, "Invalid data length. Expected data size to be a multiply of <batch_size>\n");
+            exit(1);
+        }
 
-//    FILE* pipe = open_resource("FIFO", args.pipe_path, "r");
+        // Opening the output file
+        int input_file = open_resource("input file", args.output_filepath, O_CREAT|O_RDONLY, S_IRWXU);
+
+        // Locking the file
+        flock(input_file, LOCK_EX);
+
+        // Reading the previous contents
+        Aggregate_t *aggregate = read_aggregate(input_file);
+        close(input_file);
+
+        // Adding new content to the aggregate
+        aggregate_add_data(aggregate, line_idx, buffer, data_size);
+
+        // Saving the new contents
+        int output_file = open_resource("output file", args.output_filepath, O_WRONLY|O_TRUNC, 0);
+        write_aggregate(aggregate, output_file);
+        close(output_file);
+
+        // Unlocking the file
+        flock(input_file, LOCK_UN);
+
+        // Freeing memory.
+        free_aggregate(aggregate);
+    }
 
     // Freeing all resources.
-    free_aggregate(aggregate);
-//    fclose(pipe);
-    fclose(output_file);
+    fclose(pipe);
+    free(buffer);
 
     return 0;
 }

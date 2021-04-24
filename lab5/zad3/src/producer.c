@@ -64,21 +64,21 @@ int main(int argc, char** argv)
     read_and_validate_args(argc, argv, &args);
 
     // Greeting message
-    printf("=== PRODUCER [%d] ===\n", producer_id);
+    printf("=== PRODUCER [%d] ===\n", args.producer_id);
     printf("Reading from '%s', '%d' elements per batch to '%s'.\n\n", args.input_filepath, args.batch_size, args.pipe_path);
 
-    FILE* pipe = open_resource("FIFO", pipe_path, "w");
-    FILE* data_file = open_resource("data file", input_filepath, "r");
+    FILE* pipe = open_resource_std("FIFO", args.pipe_path, "w");
+    FILE* data_file = open_resource_std("data file", args.input_filepath, "r");
 
     // Initializing the data buffer.
-    char* data_buffer = malloc(sizeof(char) * (batch_size + 1));
+    char* data_buffer = malloc(sizeof(char) * (args.batch_size + 1));
 
-    int len_read = 0;
-    while ((len_read = fread(data_buffer, sizeof(char), batch_size, data_file)) > 0)
+    size_t len_read;
+    while ((len_read = fread(data_buffer, sizeof(char), args.batch_size, data_file)) > 0)
     {
         data_buffer[len_read + 1] = '\0';
-        prinf("%s\n", data_buffer);
-        // send_to_pipe(pipe, args.producer_id, data_buffer, args.batch_size);
+        printf("%s\n", data_buffer);
+        send_to_pipe(pipe, args.producer_id, data_buffer, args.batch_size);
     }
 
     // Freeing all resources.
