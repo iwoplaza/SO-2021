@@ -38,7 +38,7 @@ MsgQueue_t* msg_open_server(bool create)
 MsgQueue_t* msg_create_client()
 {
     // Trying to create a client queue.
-    int id = msgget(IPC_PRIVATE, IPC_CREAT | S_IRWXU | S_IRWXG | S_IRWXO);
+    int id = msgget(IPC_PRIVATE, S_IRWXU | S_IRWXG | S_IRWXO);
 
     MsgQueue_t* queue = malloc(sizeof(MsgQueue_t));
     queue->id = id;
@@ -72,7 +72,7 @@ void msg_destroy(MsgQueue_t* msg_queue)
 
 int msg_receive(MsgQueue_t* queue, Data_t* data)
 {
-    return msgrcv(queue->id, &data, MAX_MSG_LENGTH, 0, 0);
+    return msgrcv(queue->id, data, MAX_MSG_LENGTH, 0, 0);
 }
 
 void msg_send_str(MsgQueue_t* queue, MsgType_t msg_type, char* msg_content)

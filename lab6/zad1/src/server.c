@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <string.h>
+#include <signal.h>
+#include <stdlib.h>
 #include "queue.h"
+#include "utils.h"
 
 #define MAX_CLIENTS 16
 
@@ -9,6 +12,7 @@ typedef struct Client_t {
 } Client_t;
 
 MsgQueue_t* server_queue;
+char server_queue_id[64];
 Client_t clients[MAX_CLIENTS];
 int clients_amount = 0;
 bool running = true;
@@ -34,13 +38,11 @@ void handle_init(const Data_t* request_data)
 
 void handle_requests()
 {
-
     while (running)
     {
         Data_t request_data;
         msg_receive(server_queue, &request_data);
 
-        printf("Got message of type %ld", request_data.type);
         switch (request_data.type)
         {
             case MSG_INIT:
@@ -62,18 +64,38 @@ void handle_shutdown()
 
     // Destroying the server queue.
     msg_destroy(server_queue);
+
+    exit(0);
+}
+
+void init()
+{
+    printf(INIT_LOG_FMT, "Setting up server queue... ");
+    server_queue = msg_open_server(true);
+    if (server_queue == NULL)
+    {
+        print_error();
+        fprintf(stderr, "\033[31m%s\n", msg_get_error());
+        exit(1);
+    }
+
+    msg_get_queue_id(server_queue, server_queue_id);
+    print_ok_msg("Queue ID: %s", server_queue_id);
 }
 
 int main()
 {
-    server_queue = msg_open_server(true);
-    
-    if (server_queue == NULL)
-    {
-        return 1;
-    }
+    signal(SIGINT, handle_shutdown);
 
-    printf("Server has been set up.\n");
+    printf("============\n");
+    printf("== SERVER ==\n");
+    printf("============\n\n");
+
+    init();
+
+    printf("Server has been set up.");
+    // Flushing before setting up the listener loop.
+    fflush(stdout);
 
     handle_requests();
 

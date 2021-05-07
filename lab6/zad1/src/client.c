@@ -9,6 +9,8 @@ MsgQueue_t* client_queue;
 int client_id = -1;
 char client_queue_id[64];
 
+bool running = true;
+
 void send_init()
 {
     msg_send_str(server_queue, MSG_INIT, client_queue_id);
@@ -34,6 +36,62 @@ void handle_shutdown(int signo)
     // Destroying the client queue
     msg_close(server_queue);
     msg_destroy(client_queue);
+
+    exit(0);
+}
+
+void init()
+{
+    printf(INIT_LOG_FMT, "Setting up client queue... ");
+    client_queue = msg_create_client();
+    if (client_queue == NULL)
+    {
+        print_error();
+        fprintf(stderr, "\033[31m%s\n", msg_get_error());
+        exit(1);
+    }
+
+    msg_get_queue_id(client_queue, client_queue_id);
+    print_ok_msg("Queue ID: %s", client_queue_id);
+
+    // -------
+
+    printf(INIT_LOG_FMT, "Connecting to server queue... ");
+    server_queue = msg_open_server(false);
+
+    if (server_queue == NULL)
+    {
+        print_error();
+        fprintf(stderr, "\033[31m%s\n", msg_get_error());
+        exit(1);
+    }
+
+    print_ok();
+
+    // -------
+
+    printf(INIT_LOG_FMT, "Initializing... ");
+    send_init();
+    print_ok_msg("Client id: %d", client_id);
+}
+
+void handle_commands()
+{
+    char cmd_buffer[256];
+    
+    while (running)
+    {
+
+        Data_t request_data;
+        msg_receive(server_queue, &request_data);
+
+        switch (request_data.type)
+        {
+            case MSG_STOP:
+                running = false;
+                break;
+        }
+    }
 }
 
 int main()
@@ -44,39 +102,12 @@ int main()
     printf("== CLIENT ==\n");
     printf("============\n\n");
 
-    // -------
+    init();
 
-    printf("Setting up client queue... ");
-    client_queue = msg_create_client();
-    msg_get_queue_id(client_queue, client_queue_id);
+    // Flushing before setting up the listener loop.
+    fflush(stdout);
 
-    if (client_queue == NULL)
-    {
-        print_error();
-        fprintf(stderr, "\033[31m%s\n", msg_get_error());
-        return 1;
-    }
-    print_ok();
-
-    // -------
-
-    printf("Connecting to server queue... ");
-    server_queue = msg_open_server(false);
-
-    if (server_queue == NULL)
-    {
-        print_error();
-        fprintf(stderr, "\033[31m%s\n", msg_get_error());
-        return 1;
-    }
-
-    print_ok();
-
-    // -------
-
-    printf("Initializing... ");
-    send_init();
-    print_ok_msg(" - received client id: %d", client_id);
+    handle_commands();
 
     handle_shutdown(0);
 
