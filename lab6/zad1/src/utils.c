@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
 
 void print_ok_msg(const char* msg, ...)
 {
@@ -28,4 +30,22 @@ void print_ok()
 void print_error()
 {
     printf("\033[30;41m ERROR \033[0m\n");
+}
+
+/**
+ * Works like sscanf for a single integer, but returns the amount of
+ * buffer that was "consumed" to parse that int.
+ * @param buffer
+ * @param output
+ * @return
+ */
+int sscanint(const char* buffer, int* output)
+{
+    static char read_buffer[64];
+
+    sscanf(buffer, "%s", read_buffer);
+
+    *output = atoi(read_buffer);
+
+    return strlen(read_buffer);
 }

@@ -9,7 +9,7 @@
 
 char msg_error[256];
 
-MsgQueue_t* msg_open_server(bool create)
+MsgQueue_t *msg_open_server(bool create)
 {
     key_t key = ftok(QUEUE_FILEPATH, 'S');
 
@@ -29,39 +29,39 @@ MsgQueue_t* msg_open_server(bool create)
         return NULL;
     }
 
-    MsgQueue_t* queue = malloc(sizeof(MsgQueue_t));
+    MsgQueue_t *queue = malloc(sizeof(MsgQueue_t));
     queue->id = id;
 
     return queue;
 }
 
-MsgQueue_t* msg_create_client()
+MsgQueue_t *msg_create_client()
 {
     // Trying to create a client queue.
     int id = msgget(IPC_PRIVATE, S_IRWXU | S_IRWXG | S_IRWXO);
 
-    MsgQueue_t* queue = malloc(sizeof(MsgQueue_t));
+    MsgQueue_t *queue = malloc(sizeof(MsgQueue_t));
     queue->id = id;
 
     return queue;
 }
 
-MsgQueue_t* msg_queue_from_id(const char* id_str)
+MsgQueue_t *msg_queue_from_id(const char *id_str)
 {
     int id = atoi(id_str);
 
-    MsgQueue_t* queue = malloc(sizeof(MsgQueue_t));
+    MsgQueue_t *queue = malloc(sizeof(MsgQueue_t));
     queue->id = id;
 
     return queue;
 }
 
-void msg_close(MsgQueue_t* msg_queue)
+void msg_close(MsgQueue_t *msg_queue)
 {
     // There is no such thing as "closing" a connection in System V.
 }
 
-void msg_destroy(MsgQueue_t* msg_queue)
+void msg_destroy(MsgQueue_t *msg_queue)
 {
     // Destroying the queue.
     msgctl(msg_queue->id, IPC_RMID, NULL);
@@ -70,12 +70,67 @@ void msg_destroy(MsgQueue_t* msg_queue)
     free(msg_queue);
 }
 
-int msg_receive(MsgQueue_t* queue, Data_t* data)
+int _fetch_pending_of_type(MsgQueue_t *queue, Data_t *data, MsgType_t type, MessageHandler_t pending_handler)
 {
-    return msgrcv(queue->id, data, MAX_MSG_LENGTH, 0, 0);
+    // Checking if we perhaps received a 'type' message.
+    int status = msgrcv(queue->id, data, MAX_MSG_LENGTH, type, IPC_NOWAIT);
+
+    if (status != -1)
+    {
+        // We had a 'type' message pending.
+        pending_handler(data);
+    }
+    else if (errno != ENOMSG)
+    {
+        sprintf(msg_error, "Couldn't read from the queue, Errno: %d", errno);
+        return -1;
+    }
+
+    return 0;
 }
 
-void msg_send_str(MsgQueue_t* queue, MsgType_t msg_type, char* msg_content)
+int msg_wait_for_type(MsgQueue_t *queue, Data_t *data, MsgType_t type, MessageHandler_t pending_handler)
+{
+    if (msg_fetch_pending(queue, data, pending_handler) == -1)
+        return -1;
+
+    if (msgrcv(queue->id, data, MAX_MSG_LENGTH, type, 0) == -1)
+    {
+        sprintf(msg_error, "Couldn't read from the queue, Errno: %d", errno);
+        return -1;
+    }
+
+    return 0;
+}
+
+int msg_fetch_pending(MsgQueue_t* queue, Data_t *data, MessageHandler_t handler)
+{
+    // Checking if we perhaps received any of the following message.
+    if (_fetch_pending_of_type(queue, data, MSG_STOP, handler) == -1)
+        return -1;
+
+    if (_fetch_pending_of_type(queue, data, MSG_DISCONNECT, handler) == -1)
+        return -1;
+
+    if (_fetch_pending_of_type(queue, data, MSG_CONNECT, handler) == -1)
+        return -1;
+
+    return 0;
+}
+
+int msg_fetch_all(MsgQueue_t* queue, Data_t *data, MessageHandler_t handler)
+{
+    // Fetching pending message from last to first.
+    for (int i = MSG_TYPES - 1; i >= 1; --i)
+    {
+        if (_fetch_pending_of_type(queue, data, i, handler) == -1)
+            return -1;
+    }
+
+    return 0;
+}
+
+void msg_send_str(MsgQueue_t *queue, MsgType_t msg_type, char *msg_content)
 {
     Data_t data;
 
@@ -85,12 +140,12 @@ void msg_send_str(MsgQueue_t* queue, MsgType_t msg_type, char* msg_content)
     msgsnd(queue->id, &data, MAX_MSG_LENGTH, 0);
 }
 
-int msg_get_queue_id(MsgQueue_t* queue, char* buffer)
+int msg_get_queue_id(MsgQueue_t *queue, char *buffer)
 {
     return sprintf(buffer, "%d", queue->id);
 }
 
-const char* msg_get_error()
+const char *msg_get_error()
 {
     return msg_error;
 }
