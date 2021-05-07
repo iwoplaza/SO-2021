@@ -1,0 +1,31 @@
+# We specify what kind of extensions we want to clean up
+CLEAN_EXTS = o a
+
+# COMMON_SRC_FILES = 
+SRC_FILES = src/main.c $(COMMON_SRC_FILES)
+
+MYLIB_NAME = -lmylib
+MYLIB_INCLUDE_DIR = ../lab1/src
+MYLIB_LINK_DIR = ../lab1/out
+
+OUT_FILE = bin/kol1
+
+#DEBUG_FLAGS =  -ggdb
+OPTIMIZATION = -O2
+
+COMMON_ARGS = -Wall $(OPTIMIZATION) $(SRC_FILES) $(DEBUG_FLAGS)
+
+all: $(SRC_FILES)
+	gcc -o $(OUT_FILE) $(COMMON_ARGS) -I. -I$(MYLIB_INCLUDE_DIR) -L$(MYLIB_LINK_DIR)/static $(MYLIB_NAME)
+
+all_dynamic: $(SRC_FILES)
+	gcc -o $(OUT_FILE) $(COMMON_ARGS) -I. -I$(MYLIB_INCLUDE_DIR) -L$(MYLIB_LINK_DIR)/dynamic $(MYLIB_NAME) -Wl,-rpath=./
+
+all_dynamic_loaded: $(SRC_FILES)
+	gcc -o $(OUT_FILE) $(COMMON_ARGS) -I. -D DYN_LOAD -ldl -Wl,-rpath=./
+
+test: all_dynamic_loaded
+	cd bin && echo "Testing..."
+
+clean:
+	for file in $(CLEAN_EXTS); do rm -f *.$$file; done
