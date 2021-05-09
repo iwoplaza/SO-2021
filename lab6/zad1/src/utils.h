@@ -5,6 +5,8 @@
 #define COL_RESET "\033[0m"
 #define COL_YELLOW "\033[1;33m"
 #define COL_BLUE "\033[0;34m"
+#define COL_CYAN "\033[0;36m"
+#define COL_ERROR "\033[0;31m"
 
 void print_ok_msg(const char* msg, ...);
 void print_ok();

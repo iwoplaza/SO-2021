@@ -12,7 +12,8 @@ typedef struct Data_t {
 } Data_t;
 
 typedef struct MsgQueue_t {
-    int id;
+    int id; // System V & Posix
+    char* filepath; // Posix
 } MsgQueue_t;
 
 typedef void (*MessageHandler_t)(Data_t* data);
@@ -22,6 +23,7 @@ MsgQueue_t* msg_create_client();
 MsgQueue_t* msg_queue_from_id(const char* id_str);
 void msg_close(MsgQueue_t* msg_queue);
 void msg_destroy(MsgQueue_t* msg_queue);
+void msg_free(MsgQueue_t* msg_queue);
 
 /**
  * Waits until a message of type 'type' appears.
@@ -41,7 +43,7 @@ int msg_fetch_pending(MsgQueue_t* queue, Data_t *data, MessageHandler_t handler)
  * This function DOES NOT wait for anything.
  */
 int msg_fetch_all(MsgQueue_t* queue, Data_t *data, MessageHandler_t handler);
-void msg_send_str(MsgQueue_t* queue, MsgType_t msg_type, char* msg_content);
+void msg_send_str(MsgQueue_t* queue, MsgType_t msg_type, const char* msg_content);
 int msg_get_queue_id(MsgQueue_t* queue, char* buffer);
 
 const char* msg_get_error();

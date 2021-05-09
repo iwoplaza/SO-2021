@@ -11,7 +11,7 @@ char msg_error[256];
 
 MsgQueue_t *msg_open_server(bool create)
 {
-    key_t key = ftok(QUEUE_FILEPATH, 'S');
+    key_t key = ftok(getenv("HOME"), QUEUE_SERVER_SYMBOL);
 
     // Trying to create/open a server message queue.
     int id = msgget(key, (create ? IPC_CREAT : 0) | S_IRWXU | S_IRWXG | S_IRWXO);
@@ -65,7 +65,10 @@ void msg_destroy(MsgQueue_t *msg_queue)
 {
     // Destroying the queue.
     msgctl(msg_queue->id, IPC_RMID, NULL);
+}
 
+void msg_free(MsgQueue_t *msg_queue)
+{
     // Freeing the container's memory.
     free(msg_queue);
 }
@@ -105,7 +108,8 @@ int msg_wait_for_type(MsgQueue_t *queue, Data_t *data, MsgType_t type, MessageHa
 
 int msg_fetch_pending(MsgQueue_t* queue, Data_t *data, MessageHandler_t handler)
 {
-    // Checking if we perhaps received any of the following message.
+    // Checking if we perhaps received any of the following messages.
+
     if (_fetch_pending_of_type(queue, data, MSG_STOP, handler) == -1)
         return -1;
 
@@ -113,6 +117,9 @@ int msg_fetch_pending(MsgQueue_t* queue, Data_t *data, MessageHandler_t handler)
         return -1;
 
     if (_fetch_pending_of_type(queue, data, MSG_CONNECT, handler) == -1)
+        return -1;
+
+    if (_fetch_pending_of_type(queue, data, MSG_CHAT, handler) == -1)
         return -1;
 
     return 0;
@@ -130,7 +137,7 @@ int msg_fetch_all(MsgQueue_t* queue, Data_t *data, MessageHandler_t handler)
     return 0;
 }
 
-void msg_send_str(MsgQueue_t *queue, MsgType_t msg_type, char *msg_content)
+void msg_send_str(MsgQueue_t *queue, MsgType_t msg_type, const char *msg_content)
 {
     Data_t data;
 
