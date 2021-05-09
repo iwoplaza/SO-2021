@@ -44,7 +44,7 @@ delivery_posix_debug: $(DELIVERY_SRC_FILES)
 
 # General
 
-all: chef_systemv_debug delivery_systemv_debug chef_posix_debug delivery_posix_debug
+all: main_systemv chef_systemv_debug delivery_systemv_debug chef_posix_debug delivery_posix_debug
 
 clean:
 	for file in $(CLEAN_EXTS); do rm -f *.$$file; done

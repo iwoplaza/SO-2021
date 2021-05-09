@@ -8,24 +8,27 @@
 #include <unistd.h>
 
 void run();
-int helper_take_pizza(Helper_t* helper);
+int helper_take_pizza();
 
-bool running = true;
+Helper_t* helper = NULL;
+
+void on_shutdown();
 
 void handle_interrupt()
 {
-    running = false;
+    exit(0);
 }
 
 int main(int argc, char** argv)
 {
+    atexit(on_shutdown);
+
     signal(SIGINT, handle_interrupt);
     srand(time(NULL));
+    setvbuf(stdout, NULL, _IONBF, 0);
 
-    printf("==DELIVERY==\n\n");
-
-    printf("Initializing... ");
-    Helper_t* helper = helper_init(false);
+    printf("==DELIVERY== Initializing... ");
+    helper = helper_init(false);
     if (helper == NULL)
     {
         print_error();
@@ -37,16 +40,24 @@ int main(int argc, char** argv)
     run();
 
     // Cleaning up.
-    helper_free(helper);
-
-    printf("Delivery has finished execution...");
+    on_shutdown();
 
     return 0;
 }
 
-void run(Helper_t* helper)
+void on_shutdown()
 {
-    while (running)
+    if (helper != NULL)
+    {
+        helper_free(helper);
+    }
+
+    printf(COL_YELLOW "Delivery has finished execution...\n" COL_RESET);
+}
+
+_Noreturn void run()
+{
+    while (true)
     {
         int pizza_type = helper_take_pizza(helper);
 
@@ -59,7 +70,7 @@ void run(Helper_t* helper)
     }
 }
 
-int helper_take_pizza(Helper_t* helper)
+int helper_take_pizza()
 {
     SharedMemoryData_t* shared_data = helper_get_shared_data(helper);
 
@@ -71,8 +82,12 @@ int helper_take_pizza(Helper_t* helper)
     // This will block until items appear on the table.
     helper_sem_change(helper, SEM_IDX_TABLE_ITEMS, -1);
 
+    printf("[DEL] Waiting for access...\n");
+
     // GET
     helper_request_access(helper, SEM_IDX_TABLE_ACCESS);
+
+    printf("[DEL] GOT ACCESS\n");
 
     // We do that after getting access to the table so that chefs don't put additional
     // items onto the table which could trigger other delivery men to act out of sync.
@@ -82,14 +97,14 @@ int helper_take_pizza(Helper_t* helper)
     int idx_to_take = 0;
     while (shared_data->table[idx_to_take] == -1)
     {
-        idx_to_take = idx_to_take % TABLE_CAPACITY;
+        idx_to_take = (idx_to_take + 1) % TABLE_CAPACITY;
     }
 
     int pizza_type = shared_data->table[idx_to_take];
     shared_data->table[idx_to_take] = -1;
 
     print_common_info();
-    printf("Pobieram pizze: %d Liczba pizz na stole: %d\n", pizza_type, helper_get_sem(helper, SEM_IDX_TABLE_ITEMS) - 1);
+    printf("Pobieram pizze: %d Liczba pizz na stole: %d\n", pizza_type, get_pizzas_on_table(helper));
 
     // RETURN
     helper_return_access(helper, SEM_IDX_TABLE_ACCESS);

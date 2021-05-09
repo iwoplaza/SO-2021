@@ -10,22 +10,25 @@ void run();
 void place_oven(Helper_t* helper, int pizza_type, int* oven_idx);
 void move_to_table(Helper_t* helper, int oven_idx);
 
-bool running = true;
+Helper_t* helper = NULL;
+
+void on_shutdown();
 
 void handle_interrupt()
 {
-    running = false;
+    exit(0);
 }
 
 int main(int argc, char** argv)
 {
+    atexit(on_shutdown);
+
     signal(SIGINT, handle_interrupt);
     srand(time(NULL));
+    setvbuf(stdout, NULL, _IONBF, 0);
 
-    printf("==CHEF==\n\n");
-
-    printf("Initializing... ");
-    Helper_t* helper = helper_init(false);
+    printf("==CHEF== Initializing... ");
+    helper = helper_init(false);
     if (helper == NULL)
     {
         print_error();
@@ -34,19 +37,27 @@ int main(int argc, char** argv)
     print_ok();
 
     // Running.
-    run();
+    run(helper);
 
     // Cleaning up.
-    helper_free(helper);
-
-    printf("Chef has finished execution...");
+    on_shutdown();
 
     return 0;
 }
 
-void run(Helper_t* helper)
+void on_shutdown()
 {
-    while (running)
+    if (helper != NULL)
+    {
+        helper_free(helper);
+    }
+
+    printf(COL_YELLOW "Chef has finished execution...\n" COL_RESET);
+}
+
+_Noreturn void run()
+{
+    while (true)
     {
         int pizza_type = rand() % 10;
 
@@ -66,6 +77,7 @@ void run(Helper_t* helper)
 
 void place_oven(Helper_t* helper, int pizza_type, int* oven_idx)
 {
+
     // Reserving a space for the pizza. This is done before asking for access
     // because another chef could ask for access in order to remove a pizza,
     // while we'd be waiting for the capacity to change. We'd be locked.
@@ -88,7 +100,7 @@ void place_oven(Helper_t* helper, int pizza_type, int* oven_idx)
     shared_data->oven_tail++;
 
     print_common_info();
-    printf("Dodalem pizze: %d. Liczba pizz w piecu: %d\n", pizza_type, OVEN_CAPACITY - helper_get_sem(helper, SEM_IDX_OVEN_CAPACITY) + 1);
+    printf("Dodalem pizze: %d. Liczba pizz w piecu: %d\n", pizza_type, get_pizzas_in_oven(helper));
 
     // Giving back access to the oven.
     helper_return_access(helper, SEM_IDX_OVEN_ACCESS);
@@ -108,10 +120,14 @@ void move_to_table(Helper_t* helper, int oven_idx)
     // Increasing the capacity, because we're taking a pizza from the oven.
     helper_sem_change(helper, SEM_IDX_OVEN_CAPACITY, 1);
 
+    print_table(shared_data->oven, OVEN_CAPACITY);
+
     int pizza_type = shared_data->oven[oven_idx];
     shared_data->oven[oven_idx] = -1;
 
-    int pizza_items = OVEN_CAPACITY - helper_get_sem(helper, SEM_IDX_OVEN_CAPACITY) + 1;
+    int pizza_items = get_pizzas_in_oven(helper);
+
+    print_table(shared_data->oven, OVEN_CAPACITY);
 
     helper_return_access(helper, SEM_IDX_OVEN_ACCESS);
 
@@ -122,12 +138,14 @@ void move_to_table(Helper_t* helper, int oven_idx)
     // Reserving a space for the pizza. This is done before asking for access
     // because a delivery worker could ask for access in order to remove a pizza,
     // while we'd be waiting for the capacity to change. We'd be locked.
+    printf("Table capacity: %d\n", helper_get_sem(helper, SEM_IDX_TABLE_CAPACITY));
     helper_sem_change(helper, SEM_IDX_TABLE_CAPACITY, -1);
 
     // Requesting access to the table.
     helper_request_access(helper, SEM_IDX_TABLE_ACCESS);
 
     // Adding an item on the table.
+    int pizzas_on_table = get_pizzas_on_table(helper);
     helper_sem_change(helper, SEM_IDX_TABLE_ITEMS, 1);
 
     // Traversing forward in search of a free spot.
@@ -143,7 +161,7 @@ void move_to_table(Helper_t* helper, int oven_idx)
     printf("Wyjmuję pizze: %d. Liczba pizz w piecu: %d. Liczba pizz na stole: %d\n",
            pizza_type,
            pizza_items,
-           helper_get_sem(helper, SEM_IDX_TABLE_ITEMS) - 1);
+           pizzas_on_table + 1);
 
     // Giving back access to the table.
     helper_return_access(helper, SEM_IDX_TABLE_ACCESS);

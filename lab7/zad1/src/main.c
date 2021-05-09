@@ -1,5 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <signal.h>
+#include <sys/wait.h>
+#include "helper.h"
+#include "utils.h"
 
 #ifndef LAB7_MAIN_NAME
     #define LAB7_MAIN_NAME "main_systemv"
@@ -7,13 +12,23 @@
     #define LAB7_DELIVERY_NAME "delivery_systemv"
 #endif
 
+bool running = true;
+
+void handle_interrupt()
+{
+    running = false;
+}
+
 int main(int argc, char** argv)
 {
+    signal(SIGINT, handle_interrupt);
+
     printf("==COORDINATOR==\n\n");
 
     if (argc != 3)
     {
         printf("USAGE: " LAB7_MAIN_NAME " amount_of_chefs amount_of_delivery");
+        return 0;
     }
 
     int amount_of_chefs = atoi(argv[1]);
@@ -24,6 +39,16 @@ int main(int argc, char** argv)
         fprintf(stderr, "The arguments have to be positive numbers.\n");
         return 1;
     }
+
+    // Setting up IPC
+    printf("Setting up IPC... ");
+    Helper_t* helper = helper_init(true);
+    if (helper == NULL)
+    {
+        print_error();
+        return 1;
+    }
+    print_ok();
 
     printf("Creating %d chefs and %d delivery workers.\n", amount_of_chefs, amount_of_delivery);
 
@@ -74,6 +99,9 @@ int main(int argc, char** argv)
     // Waiting for child processes to end.
     int status = 0;
     while ((wait(&status)) > 0);
+
+    helper_destroy(helper);
+    helper_free(helper);
 
     return 0;
 }

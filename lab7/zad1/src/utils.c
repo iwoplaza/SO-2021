@@ -4,6 +4,7 @@
 #include <math.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include "utils.h"
 
 void print_ok_msg(const char* msg, ...)
 {
@@ -38,14 +39,35 @@ void print_common_info()
 {
     struct timespec tms;
 
-    clock_gettime(CLOCK_REALTIME, &tms);
+    clock_gettime(CLOCK_MONOTONIC, &tms);
 
-    long ms = round(tms.tv_nsec / 1.0e6);
+    long ms = round(tms.tv_nsec / 1000000);
 
     printf("(%d, %ld) ", getpid(), ms);
 }
 
 void sleep_between_seconds(int from, int to)
 {
-    sleep(from + rand() % (to - from + 1));
+    int seconds = from + rand() % (to - from + 1);
+    sleep(seconds);
+}
+
+int get_pizzas_in_oven(Helper_t* helper)
+{
+    return OVEN_CAPACITY - helper_get_sem(helper, SEM_IDX_OVEN_CAPACITY);
+}
+
+int get_pizzas_on_table(Helper_t* helper)
+{
+    return helper_get_sem(helper, SEM_IDX_TABLE_ITEMS);
+}
+
+void print_table(int* table, int size)
+{
+    printf("[");
+    for (int i = 0; i < size; ++i)
+    {
+        printf("%d ", table[i]);
+    }
+    printf("]\n");
 }

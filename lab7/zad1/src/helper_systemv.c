@@ -8,8 +8,12 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <errno.h>
+
+typedef void (*InterruptHandler_t)();
 
 static char msg_error[256];
+static InterruptHandler_t _interrupt_handler;
 
 union semun {
     int              val;    /* Value for SETVAL */
@@ -18,12 +22,18 @@ union semun {
     struct seminfo  *__buf;  /* Buffer for IPC_INFO (Linux-specific) */
 };
 
-void _set_sem_value(int sem_group_id, int sem_idx, int value)
+int _set_sem_value(int sem_group_id, int sem_idx, int value)
 {
     union semun arg;
     arg.val = value;
 
-    semctl(sem_group_id, sem_idx, SETVAL, arg);
+    if (semctl(sem_group_id, sem_idx, SETVAL, arg) == -1)
+    {
+        perror("Couldn't set semaphore value");
+        return -1;
+    }
+
+    return 0;
 }
 
 Helper_t* helper_init(bool setup)
@@ -32,7 +42,7 @@ Helper_t* helper_init(bool setup)
 
     // --SEMAPHORES--
 
-    int sem_group_id = -1;
+    int sem_group_id;
 
     if (setup)
     {
@@ -41,17 +51,24 @@ Helper_t* helper_init(bool setup)
         // Setting defaults
         _set_sem_value(sem_group_id, SEM_IDX_OVEN_CAPACITY, OVEN_CAPACITY);
         _set_sem_value(sem_group_id, SEM_IDX_TABLE_CAPACITY, TABLE_CAPACITY);
-        _set_sem_value(sem_group_id, SEM_IDX_OVEN_ACCESS, 2);
-        _set_sem_value(sem_group_id, SEM_IDX_TABLE_ACCESS, 2);
+        _set_sem_value(sem_group_id, SEM_IDX_OVEN_ACCESS, 1);
+        _set_sem_value(sem_group_id, SEM_IDX_TABLE_ACCESS, 1);
+        _set_sem_value(sem_group_id, SEM_IDX_TABLE_ITEMS, 0);
     }
     else
     {
-        sem_group_id = semget(key, 0, 0);
+        sem_group_id = semget(key, SEM_AMOUNT, 0);
+    }
+
+    if (sem_group_id == -1)
+    {
+        perror("Failed to open semaphore group");
+        return NULL;
     }
 
     // --SHARED MEMORY--
 
-    int shm_id = -1;
+    int shm_id;
     if (setup)
     {
         shm_id = shmget(key, sizeof(SharedMemoryData_t), IPC_CREAT | S_IRWXU | S_IRWXG | S_IRWXO);
@@ -74,6 +91,19 @@ Helper_t* helper_init(bool setup)
         return NULL;
     }
 
+    if (setup)
+    {
+        // Initializing shared memory.
+        shared_data->oven_tail = 0;
+        shared_data->table_tail = 0;
+
+        for (int i = 0; i < OVEN_CAPACITY; ++i)
+            shared_data->oven[i] = -1;
+
+        for (int i = 0; i < TABLE_CAPACITY; ++i)
+            shared_data->table[i] = -1;
+    }
+
     Helper_t* helper = malloc(sizeof(Helper_t));
     helper->sem_group_id = sem_group_id;
     helper->shm_id = shm_id;
@@ -84,6 +114,8 @@ Helper_t* helper_init(bool setup)
 
 void helper_destroy(Helper_t* helper)
 {
+    semctl(helper->sem_group_id, 0, IPC_RMID);
+
     // Unlinking the shared memory chunk.
     // It will get removed once every process stop using it.
     shmctl(helper->shm_id, IPC_RMID, NULL);
@@ -109,7 +141,10 @@ void helper_sem_change(Helper_t* helper, int sem_idx, short delta)
     sops[0].sem_op = delta;
     sops[0].sem_flg = 0;
 
-    semop(helper->sem_group_id, sops, 1);
+    if (semop(helper->sem_group_id, sops, 1) == -1)
+    {
+        perror("Semop failed");
+    }
 }
 
 void helper_request_access(Helper_t* helper, int sem_idx)
@@ -130,6 +165,11 @@ int helper_get_sem(Helper_t* helper, int sem_idx)
 SharedMemoryData_t* helper_get_shared_data(Helper_t* helper)
 {
     return helper->shared_data;
+}
+
+void helper_set_interrupt_handler(void (*handler)())
+{
+    _interrupt_handler = handler;
 }
 
 const char* helper_get_error()
