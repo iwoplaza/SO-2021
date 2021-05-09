@@ -1,0 +1,6 @@
+#ifndef LAB7_HELPER_POSIX_H
+#define LAB7_HELPER_POSIX_H
+
+
+
+#endif //LAB7_HELPER_POSIX_H

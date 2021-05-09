@@ -320,7 +320,7 @@ int main()
     signal(SIGINT, handle_interrupt);
     atexit(handle_shutdown);
 
-    srand(time(NULL));   // Initialization, should only be called once.
+    srand(time(NULL));
 
     printf("============\n");
     printf("== CLIENT ==\n");
