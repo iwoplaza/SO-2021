@@ -18,5 +18,6 @@ typedef enum PGMStatus_t {
 PGMStatus_t pgm_parse(FILE* in, PGMImage_t* image_dest);
 PGMStatus_t pgm_write(FILE* out, const PGMImage_t* image_src);
 void pgm_free(PGMImage_t* image);
+const char* pcm_get_error();
 
 #endif // PGM_H
