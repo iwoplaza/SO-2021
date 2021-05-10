@@ -35,15 +35,27 @@ void print_error()
     printf("\033[30;41m ERROR \033[0m\n");
 }
 
+static __time_t start_time;
+
+void mark_start_time()
+{
+    struct timespec tms;
+
+    clock_gettime(CLOCK_REALTIME, &tms);
+
+    start_time = tms.tv_sec;
+}
+
 void print_common_info()
 {
     struct timespec tms;
 
-    clock_gettime(CLOCK_MONOTONIC, &tms);
+    clock_gettime(CLOCK_REALTIME, &tms);
 
-    long ms = round(tms.tv_nsec / 1000000);
+    long long full_ms = (tms.tv_sec - start_time) * 1000;
+    long delta_ms = tms.tv_nsec / 1000000;
 
-    printf("(%d, %ld) ", getpid(), ms);
+    printf("(%d, %lld) ", getpid(), full_ms + delta_ms);
 }
 
 void sleep_between_seconds(int from, int to)

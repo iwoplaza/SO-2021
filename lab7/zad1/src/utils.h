@@ -13,6 +13,7 @@
 void print_ok_msg(const char* msg, ...);
 void print_ok();
 void print_error();
+void mark_start_time();
 void print_common_info();
 void sleep_between_seconds(int from, int to);
 int get_pizzas_in_oven(Helper_t* helper);

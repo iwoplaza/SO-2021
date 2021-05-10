@@ -1,4 +1,3 @@
-#define LAB7_SYSTEMV
 #include "helper.h"
 #include "utils.h"
 #include <stdio.h>
@@ -21,6 +20,8 @@ void handle_interrupt()
 
 int main(int argc, char** argv)
 {
+    mark_start_time();
+
     atexit(on_shutdown);
 
     signal(SIGINT, handle_interrupt);
@@ -120,14 +121,10 @@ void move_to_table(Helper_t* helper, int oven_idx)
     // Increasing the capacity, because we're taking a pizza from the oven.
     helper_sem_change(helper, SEM_IDX_OVEN_CAPACITY, 1);
 
-    print_table(shared_data->oven, OVEN_CAPACITY);
-
     int pizza_type = shared_data->oven[oven_idx];
     shared_data->oven[oven_idx] = -1;
 
     int pizza_items = get_pizzas_in_oven(helper);
-
-    print_table(shared_data->oven, OVEN_CAPACITY);
 
     helper_return_access(helper, SEM_IDX_OVEN_ACCESS);
 
@@ -138,7 +135,6 @@ void move_to_table(Helper_t* helper, int oven_idx)
     // Reserving a space for the pizza. This is done before asking for access
     // because a delivery worker could ask for access in order to remove a pizza,
     // while we'd be waiting for the capacity to change. We'd be locked.
-    printf("Table capacity: %d\n", helper_get_sem(helper, SEM_IDX_TABLE_CAPACITY));
     helper_sem_change(helper, SEM_IDX_TABLE_CAPACITY, -1);
 
     // Requesting access to the table.

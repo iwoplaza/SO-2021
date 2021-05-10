@@ -1,5 +1,3 @@
-#define LAB7_SYSTEMV
-
 #include "helper.h"
 #include <stdlib.h>
 #include <sys/ipc.h>
@@ -8,12 +6,6 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include <errno.h>
-
-typedef void (*InterruptHandler_t)();
-
-static char msg_error[256];
-static InterruptHandler_t _interrupt_handler;
 
 union semun {
     int              val;    /* Value for SETVAL */
@@ -124,6 +116,7 @@ void helper_destroy(Helper_t* helper)
 void helper_free(Helper_t* helper)
 {
     // --SEMAPHORES--
+    // No need to close semaphores.
 
     // --SHARED MEMORY--
 
@@ -167,12 +160,3 @@ SharedMemoryData_t* helper_get_shared_data(Helper_t* helper)
     return helper->shared_data;
 }
 
-void helper_set_interrupt_handler(void (*handler)())
-{
-    _interrupt_handler = handler;
-}
-
-const char* helper_get_error()
-{
-    return msg_error;
-}

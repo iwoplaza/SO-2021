@@ -1,4 +1,3 @@
-#define LAB7_SYSTEMV
 #include "helper.h"
 #include "utils.h"
 #include <stdio.h>
@@ -21,6 +20,8 @@ void handle_interrupt()
 
 int main(int argc, char** argv)
 {
+    mark_start_time();
+
     atexit(on_shutdown);
 
     signal(SIGINT, handle_interrupt);
@@ -82,12 +83,8 @@ int helper_take_pizza()
     // This will block until items appear on the table.
     helper_sem_change(helper, SEM_IDX_TABLE_ITEMS, -1);
 
-    printf("[DEL] Waiting for access...\n");
-
     // GET
     helper_request_access(helper, SEM_IDX_TABLE_ACCESS);
-
-    printf("[DEL] GOT ACCESS\n");
 
     // We do that after getting access to the table so that chefs don't put additional
     // items onto the table which could trigger other delivery men to act out of sync.

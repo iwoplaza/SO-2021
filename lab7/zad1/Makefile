@@ -2,8 +2,13 @@
 CLEAN_EXTS = o a
 
 COMMON_SRC_FILES = src/utils.c
-SYSTEMV_SRC_FILES = src/helper_systemv.c
-POSIX_SRC_FILES = src/helper_posix.c -lrt
+SYSTEMV_SRC_FILES =src/helper_systemv.c \
+	-DLAB7_SYSTEMV
+POSIX_SRC_FILES = src/helper_posix.c -lrt -lpthread \
+	-DLAB7_POSIX \
+	-DLAB7_MAIN_NAME="\"main_posix\"" \
+	-DLAB7_CHEF_NAME="\"chef_posix\"" \
+	-DLAB7_DELIVERY_NAME="\"delivery_posix\"" \
 #OPTIMIZATION = -O2
 COMMON_ARGS = -Wall -I. $(OPTIMIZATION)
 
@@ -30,21 +35,24 @@ delivery_systemv_debug: $(DELIVERY_SRC_FILES)
 
 # Posix
 
+main_posix: $(MAIN_SRC_FILES)
+	gcc -o bin/main_posix $(COMMON_ARGS) $(MAIN_SRC_FILES) $(POSIX_SRC_FILES) -lm
+
 chef_posix: $(CHEF_SRC_FILES)
-	#gcc -o bin/chef_posix $(COMMON_ARGS) $(CHEF_SRC_FILES) $(POSIX_SRC_FILES) -lm
+	gcc -o bin/chef_posix $(COMMON_ARGS) $(CHEF_SRC_FILES) $(POSIX_SRC_FILES) -lm
 
 chef_posix_debug: $(CHEF_SRC_FILES)
-	#gcc -o bin/chef_posix $(COMMON_ARGS) $(CHEF_SRC_FILES) $(POSIX_SRC_FILES) -ggdb -lm
+	gcc -o bin/chef_posix $(COMMON_ARGS) $(CHEF_SRC_FILES) $(POSIX_SRC_FILES) -ggdb -lm
 
 delivery_posix: $(DELIVERY_SRC_FILES)
-	#gcc -o bin/delivery_posix $(COMMON_ARGS) $(DELIVERY_SRC_FILES) $(POSIX_SRC_FILES) -lm
+	gcc -o bin/delivery_posix $(COMMON_ARGS) $(DELIVERY_SRC_FILES) $(POSIX_SRC_FILES) -lm
 
 delivery_posix_debug: $(DELIVERY_SRC_FILES)
-	#gcc -o bin/delivery_posix $(COMMON_ARGS) $(DELIVERY_SRC_FILES) $(POSIX_SRC_FILES) -ggdb -lm
+	gcc -o bin/delivery_posix $(COMMON_ARGS) $(DELIVERY_SRC_FILES) $(POSIX_SRC_FILES) -ggdb -lm
 
 # General
 
-all: main_systemv chef_systemv_debug delivery_systemv_debug chef_posix_debug delivery_posix_debug
+all: main_systemv chef_systemv_debug delivery_systemv_debug main_posix chef_posix_debug delivery_posix_debug
 
 clean:
 	for file in $(CLEAN_EXTS); do rm -f *.$$file; done

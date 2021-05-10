@@ -1,0 +1,5 @@
+- Jedyne co nie jest zsynchronizowane to logi inicjalizujące kucharzy i dostawców.
+- Użycie srand(time(NULL)) powoduje, że wszyscy przyjmują taką samą "losowość", więc dla N,M < 5 wszystkie pizze
+  wkładane na raz do pieca i wyjmowane są tego samego rodzaju.
+- Dla N,M > 5 część kucharzy musi poczekać na włożenie pizzy do pieca, co wprowadza trochę więcej dodatkowej losowości
+  w rodzajach pizzy jakie w jednym momencie trafiają do pieca.
