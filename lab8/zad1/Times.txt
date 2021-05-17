@@ -1,0 +1,109 @@
+#
+# Image: pepper.ascii.pgm, 256x256
+#
+
+NUMBERS                         |   BLOCKS
+=================================================================
+Total duration: 0.779000ms      |   Total duration: 0.414000ms
+  - Thread 000: 0.244000ms      |     - Thread 000: 0.136000ms
+-----------------------------------------------------------------
+Total duration: 2.856000ms      |   Total duration: 0.518000ms
+  - Thread 000: 0.233000ms      |     - Thread 000: 0.069000ms
+  - Thread 001: 0.237000ms      |     - Thread 001: 0.071000ms
+-----------------------------------------------------------------
+Total duration: 8.857000ms      |   Total duration: 0.739000ms
+  - Thread 000: 0.231000ms      |     - Thread 000: 0.034000ms
+  - Thread 001: 0.264000ms      |     - Thread 001: 0.034000ms
+  - Thread 002: 0.233000ms      |     - Thread 002: 0.035000ms
+  - Thread 003: 0.276000ms      |     - Thread 003: 0.035000ms
+-----------------------------------------------------------------
+Total duration: 17.399000ms     |   Total duration: 1.224000ms
+  - Thread 000: 0.202000ms      |     - Thread 000: 0.017000ms
+  - Thread 001: 0.276000ms      |     - Thread 001: 0.018000ms
+  - Thread 002: 0.212000ms      |     - Thread 002: 0.017000ms
+  - Thread 003: 0.223000ms      |     - Thread 003: 0.018000ms
+  - Thread 004: 0.216000ms      |     - Thread 004: 0.018000ms
+  - Thread 005: 0.304000ms      |     - Thread 005: 0.019000ms
+  - Thread 006: 0.293000ms      |     - Thread 006: 0.023000ms
+  - Thread 007: 0.261000ms      |     - Thread 007: 0.019000ms
+-----------------------------------------------------------------
+Total duration: 37.297000ms     |   Total duration: 2.448000ms
+  - Thread 000: 0.237000ms      |     - Thread 000: 0.009000ms
+  - Thread 001: 0.216000ms      |     - Thread 001: 0.009000ms
+  - Thread 002: 0.226000ms      |     - Thread 002: 0.009000ms
+  - Thread 003: 0.281000ms      |     - Thread 003: 0.009000ms
+  - Thread 004: 0.219000ms      |     - Thread 004: 0.009000ms
+  - Thread 005: 0.217000ms      |     - Thread 005: 0.009000ms
+  - Thread 006: 0.218000ms      |     - Thread 006: 0.021000ms
+  - Thread 007: 0.245000ms      |     - Thread 007: 0.009000ms
+  - Thread 008: 0.238000ms      |     - Thread 008: 0.012000ms
+  - Thread 009: 0.234000ms      |     - Thread 009: 0.009000ms
+  - Thread 010: 0.282000ms      |     - Thread 010: 0.009000ms
+  - Thread 011: 0.250000ms      |     - Thread 011: 0.009000ms
+  - Thread 012: 0.264000ms      |     - Thread 012: 0.009000ms
+  - Thread 013: 0.440000ms      |     - Thread 013: 0.009000ms
+  - Thread 014: 0.242000ms      |     - Thread 014: 0.009000ms
+  - Thread 015: 0.209000ms      |     - Thread 015: 0.009000ms
+=================================================================
+
+
+
+
+#
+# Image: baboon.ascii.pgm, 512x512
+#
+
+NUMBERS                         |   BLOCKS
+=================================================================
+Total duration: 3.288000ms      |   Total duration: 0.996000ms
+  - Thread 000: 1.295000ms      |     - Thread 000: 0.568000ms
+-----------------------------------------------------------------
+Total duration: 21.593000ms     |   Total duration: 1.621000ms
+  - Thread 000: 4.945000ms      |     - Thread 000: 0.281000ms
+  - Thread 001: 1.582000ms      |     - Thread 001: 0.296000ms
+-----------------------------------------------------------------
+Total duration: 29.728000ms     |   Total duration: 3.720000ms
+  - Thread 000: 0.925000ms      |     - Thread 000: 0.144000ms
+  - Thread 001: 5.887000ms      |     - Thread 001: 0.148000ms
+  - Thread 002: 1.616000ms      |     - Thread 002: 0.152000ms
+  - Thread 003: 1.305000ms      |     - Thread 003: 0.173000ms
+-----------------------------------------------------------------
+Total duration: 66.672000ms     |   Total duration: 7.155000ms
+  - Thread 000: 0.736000ms      |     - Thread 000: 0.074000ms
+  - Thread 001: 0.832000ms      |     - Thread 001: 0.096000ms
+  - Thread 002: 1.068000ms      |     - Thread 002: 0.078000ms
+  - Thread 003: 1.894000ms      |     - Thread 003: 0.072000ms
+  - Thread 004: 1.643000ms      |     - Thread 004: 0.073000ms
+  - Thread 005: 1.652000ms      |     - Thread 005: 0.072000ms
+  - Thread 006: 1.206000ms      |     - Thread 006: 0.101000ms
+  - Thread 007: 0.791000ms      |     - Thread 007: 0.073000ms
+-----------------------------------------------------------------
+Total duration: 150.368000ms    |   Total duration: 13.669000ms
+  - Thread 000: 0.759000ms      |     - Thread 000: 0.063000ms
+  - Thread 001: 0.736000ms      |     - Thread 001: 0.036000ms
+  - Thread 002: 0.787000ms      |     - Thread 002: 0.039000ms
+  - Thread 003: 0.842000ms      |     - Thread 003: 0.039000ms
+  - Thread 004: 0.900000ms      |     - Thread 004: 0.042000ms
+  - Thread 005: 0.913000ms      |     - Thread 005: 0.042000ms
+  - Thread 006: 0.950000ms      |     - Thread 006: 0.067000ms
+  - Thread 007: 1.015000ms      |     - Thread 007: 0.046000ms
+  - Thread 008: 1.212000ms      |     - Thread 008: 0.040000ms
+  - Thread 009: 1.296000ms      |     - Thread 009: 0.036000ms
+  - Thread 010: 1.228000ms      |     - Thread 010: 0.038000ms
+  - Thread 011: 1.195000ms      |     - Thread 011: 0.046000ms
+  - Thread 012: 1.102000ms      |     - Thread 012: 0.052000ms
+  - Thread 013: 1.005000ms      |     - Thread 013: 0.043000ms
+  - Thread 014: 0.703000ms      |     - Thread 014: 0.038000ms
+  - Thread 015: 0.693000ms      |     - Thread 015: 0.043000ms
+=================================================================
+
+
+W metodzie NUMBERS widzimy dosyć duży narzut czasowy przeznaczony
+na obliczenie obszarów pracy dla wątków. Algorytm wyznaczania jest
+bardziej skomplikowany i prowadzi do większej segmentacji obrazu.
+Metoda BLOCKS w kontraście dzieli obraz na bardzo prostych zasadach,
+co mniejsza i narzut pamięciowy jak i narzut obliczeniowy.
+
+Zwiększony czas działania wątków w metodzie NUMBERS można przyporządkować
+zwiększoną segmentacją obszaru pracy, tzn. więcej par (początek, koniec)
+indeksów do przetworzenia.
