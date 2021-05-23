@@ -2,18 +2,15 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
 #include "common.h"
 #include "elf.h"
 #include "santa.h"
 #include "raindeer.h"
 
-static void handle_signal(int);
-static void parse_arguments();
 static void run_jobs();
 
-int elf_count;
-int raindeer_count;
+int elf_count = 3;
+int raindeer_count = 9;
 
 // Shared data
 int elves_in_workshop[MAX_ELFS_IN_WORKSHOP];
@@ -28,51 +25,12 @@ pthread_cond_t elves_inspected_condition = PTHREAD_COND_INITIALIZER;
 pthread_cond_t presents_delivered_condition = PTHREAD_COND_INITIALIZER;
 
 
-int main(int argc, char** argv)
+int main()
 {
-    if (argc != 3)
-    {
-        printf("Usage: <elf_count> <raindeer_count>");
-        return 0;
-    }
-
-//    printf("SIGRTMIN %d\n", SIGRTMIN);
-//    signal(SIGRTMIN + 31, handle_signal);
-//    signal(SIGRTMIN + 32, handle_signal);
-//    signal(SIGRTMIN + 33, handle_signal);
-
-    // Parsing arguments.
-    parse_arguments(argv);
-
     // Running threads
     run_jobs();
 
     return 0;
-}
-
-void handle_signal(int signo)
-{
-    printf("Handled signal %d\n", signo);
-    pthread_mutex_unlock(&access_mutex);
-}
-
-void parse_arguments(char** argv)
-{
-    elf_count = atoi(argv[1]);
-    raindeer_count = atoi(argv[2]);
-
-    // Checking validity
-    if (elf_count <= 0)
-    {
-        fprintf(stderr, "There has to be at least %d elves.\n", MAX_ELFS_IN_WORKSHOP);
-        exit(1);
-    }
-
-    if (raindeer_count == -1)
-    {
-        fprintf(stderr, "There has to be at least 1 raindeer.\n");
-        exit(1);
-    }
 }
 
 pthread_t create_thread(int idx, void* (*routine)(void*))

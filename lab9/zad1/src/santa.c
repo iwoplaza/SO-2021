@@ -59,7 +59,7 @@ _Noreturn void* santa_thread_routine(void* args)
 
             trips_count++;
 
-            if (trips_count >= 1)
+            if (trips_count >= 3)
             {
                 break;
             }
