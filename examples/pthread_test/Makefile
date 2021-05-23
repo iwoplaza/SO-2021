@@ -1,7 +1,7 @@
 # We specify what kind of extensions we want to clean up
 CLEAN_EXTS = o a
 
-SRC_FILES = src/main.c src/utils.c src/common.c src/elf.c src/raindeer.c src/santa.c
+SRC_FILES = src/main.c
 #OPTIMIZATION = -O2
 COMMON_ARGS = -Wall -I. $(OPTIMIZATION) -lpthread
 
