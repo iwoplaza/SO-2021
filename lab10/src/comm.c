@@ -222,7 +222,42 @@ void connect_client(int epoll_fd)
     epoll_wait(epoll_fd, events, 16, 5000);
 }
 
-ClientComm_t* comm_client_init(const char* server_address)
+ClientComm_t* comm_client_init_local()
+{
+    struct sockaddr_un addr;
+
+    int fd = socket(AF_UNIX, SOCK_TYPE, 0);
+    if (fd == -1)
+    {
+        perror("Failed to create local socket for client");
+        exit(1);
+    }
+
+    // Zeroing out the address buffer.
+    bzero((char*) &addr, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, LOCAL_SOCKET_PATH, sizeof(addr.sun_path) - 1);
+
+    if (connect(fd, (struct sockaddr*) &addr, sizeof(addr)) == -1)
+    {
+        perror("Failed to connect to server");
+        exit(1);
+    }
+
+    if (write(fd, "Hello", 5) != 5)
+    {
+        perror("partial/failed write");
+        exit(1);
+    }
+
+    ClientComm_t* comm = malloc(sizeof(ClientComm_t));
+
+    comm->socket_fd = fd;
+
+    return comm;
+}
+
+ClientComm_t* comm_client_init(ConnectionType_t connection_type, const char* server_address)
 {
     struct in_addr inp;
 
@@ -239,5 +274,6 @@ ClientComm_t* comm_client_init(const char* server_address)
 
 void comm_client_free(ClientComm_t* comm)
 {
+    close(comm->socket_fd);
     free(comm);
 }

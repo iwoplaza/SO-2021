@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 
     if (argc != 3)
     {
-        printf("Usage: <port> <socket_path>");
+        printf("Usage: <port> <socket_path>\n");
         return 0;
     }
 

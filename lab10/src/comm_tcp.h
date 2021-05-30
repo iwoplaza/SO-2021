@@ -8,7 +8,7 @@ typedef struct ServerComm_t {
 } ServerComm_t;
 
 typedef struct ClientComm_t {
-    int server_fd;
+    int socket_fd;
 } ClientComm_t;
 
 #endif //LAB10_COMM_TCP_H

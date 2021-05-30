@@ -2,7 +2,6 @@
 #define LAB10_COMM_H
 
 typedef enum ConnectionType_t {
-    UNKNOWN,
     CONNECTION_REMOTE,
     CONNECTION_LOCAL
 } ConnectionType_t;
@@ -23,7 +22,8 @@ void comm_msg_loop(ServerComm_t* server);
 void comm_server_free(ServerComm_t* comm);
 
 // Client
-ClientComm_t* comm_client_init();
+ClientComm_t* comm_client_init_local();
+ClientComm_t* comm_client_init_remote();
 void comm_client_free(ClientComm_t* comm);
 
 #endif //LAB10_COMM_H
