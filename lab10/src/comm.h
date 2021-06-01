@@ -1,6 +1,11 @@
 #ifndef LAB10_COMM_H
 #define LAB10_COMM_H
 
+#include <stdbool.h>
+#include <sys/epoll.h>
+
+#define MAX_EVENTS 16
+
 typedef enum ConnectionType_t {
     CONNECTION_REMOTE,
     CONNECTION_LOCAL
@@ -17,13 +22,18 @@ typedef enum ConnectionType_t {
 #endif
 
 // Server
-ServerComm_t* comm_server_init(int port);
+ServerComm_t* comm_server_init(int port, const char* socket_path);
 void comm_msg_loop(ServerComm_t* server);
+int comm_wait_for_events(ServerComm_t* server, struct epoll_event events[MAX_EVENTS]);
 void comm_server_free(ServerComm_t* comm);
+bool comm_handle_join_request(ServerComm_t* server, struct epoll_event* join_ev);
 
 // Client
-ClientComm_t* comm_client_init_local();
+ClientComm_t* comm_client_init_local(const char* socket_path);
 ClientComm_t* comm_client_init_remote();
 void comm_client_free(ClientComm_t* comm);
 
+// Common
+bool comm_send_msg(int fd, const char* contents);
+bool comm_read_msg(int fd, char* buffer, int buff_size);
 #endif //LAB10_COMM_H

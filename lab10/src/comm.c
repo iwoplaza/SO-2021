@@ -9,8 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdbool.h>
-#include <sys/epoll.h>
+
 #include <errno.h>
 #include "defs.h"
 
@@ -35,19 +34,19 @@ int _create_socket(int domain, const char* label)
     return fd;
 }
 
-void _bind_local_server_address(int socket_fd)
+void _bind_local_server_address(int socket_fd, const char* socket_path)
 {
     struct sockaddr_un server_addr;
 
     // Make sure the address we're planning to use isn't too long.
     unsigned int max_path_len = sizeof(server_addr.sun_path);
-    if (strlen(LOCAL_SOCKET_PATH) >= max_path_len)
+    if (strlen(socket_path) >= max_path_len)
     {
-        fprintf(stderr, "Local socket path too long: %s. Max length is %d", LOCAL_SOCKET_PATH, max_path_len);
+        fprintf(stderr, "Local socket path too long: %s. Max length is %d", socket_path, max_path_len);
         exit(1);
     }
 
-    if (remove(LOCAL_SOCKET_PATH) == -1 && errno != ENOENT)
+    if (remove(socket_path) == -1 && errno != ENOENT)
     {
         perror("Couldn't remove existing local socket file");
         exit(1);
@@ -56,7 +55,7 @@ void _bind_local_server_address(int socket_fd)
     // Zeroing out the address buffer.
     bzero((char*) &server_addr, sizeof(server_addr));
     server_addr.sun_family = AF_UNIX;
-    strncpy(server_addr.sun_path, LOCAL_SOCKET_PATH, sizeof(server_addr.sun_path) - 1);
+    strncpy(server_addr.sun_path, socket_path, sizeof(server_addr.sun_path) - 1);
 
     if (bind(socket_fd, (struct sockaddr*) &server_addr, sizeof(server_addr)) != 0)
     {
@@ -82,10 +81,10 @@ void _bind_online_server_address(int socket_fd, int port)
     }
 }
 
-ServerComm_t* comm_server_init(int port)
+ServerComm_t* comm_server_init(int port, const char* socket_path)
 {
     int local_fd = _create_socket(AF_UNIX, "local");
-    _bind_local_server_address(local_fd);
+    _bind_local_server_address(local_fd, socket_path);
 
     int online_fd = _create_socket(AF_INET, "online");
     _bind_online_server_address(online_fd, port);
@@ -131,6 +130,13 @@ void comm_server_free(ServerComm_t* comm)
     close(comm->online_fd);
     close(comm->epoll_fd);
     free(comm);
+}
+
+int comm_wait_for_events(ServerComm_t* server, struct epoll_event events[MAX_EVENTS])
+{
+    int nfds = epoll_wait(server->epoll_fd, events, MAX_EVENTS, -1);
+
+    return nfds;
 }
 
 void comm_msg_loop(ServerComm_t* server)
@@ -199,6 +205,39 @@ void comm_msg_loop(ServerComm_t* server)
     }
 }
 
+bool comm_handle_join_request(ServerComm_t* server, struct epoll_event* join_ev)
+{
+    if (join_ev->data.fd != server->online_fd && join_ev->data.fd != server->local_fd)
+    {
+        // The origin of this event wasn't the server sockets.
+        return false;
+    }
+
+    struct sockaddr_in client_addr;
+    socklen_t clilen = sizeof(client_addr);
+    int client = accept(server->local_fd, (struct sockaddr*) &client_addr, &clilen);
+
+    if (client < 0)
+    {
+        perror("Couldn't accept client.");
+        return false;
+    }
+
+    struct epoll_event accept_ev;
+    accept_ev.events = EPOLLIN;
+    accept_ev.data.fd = client;
+
+    if (epoll_ctl(server->epoll_fd, EPOLL_CTL_ADD, client, &accept_ev) < 0)
+    {
+        fprintf(stderr, "Failed to add client %d to event pool.\n", client);
+        exit(1);
+    }
+
+    printf("Added client %d.\n", client);
+
+    return true;
+}
+
 void connect_client(int epoll_fd)
 {
     int client_fd = 0;
@@ -222,7 +261,7 @@ void connect_client(int epoll_fd)
     epoll_wait(epoll_fd, events, 16, 5000);
 }
 
-ClientComm_t* comm_client_init_local()
+ClientComm_t* comm_client_init_local(const char* socket_path)
 {
     struct sockaddr_un addr;
 
@@ -236,17 +275,11 @@ ClientComm_t* comm_client_init_local()
     // Zeroing out the address buffer.
     bzero((char*) &addr, sizeof(addr));
     addr.sun_family = AF_UNIX;
-    strncpy(addr.sun_path, LOCAL_SOCKET_PATH, sizeof(addr.sun_path) - 1);
+    strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path) - 1);
 
     if (connect(fd, (struct sockaddr*) &addr, sizeof(addr)) == -1)
     {
         perror("Failed to connect to server");
-        exit(1);
-    }
-
-    if (write(fd, "Hello", 5) != 5)
-    {
-        perror("partial/failed write");
         exit(1);
     }
 
@@ -276,4 +309,28 @@ void comm_client_free(ClientComm_t* comm)
 {
     close(comm->socket_fd);
     free(comm);
+}
+
+bool comm_send_msg(int fd, const char* contents)
+{
+    int n = write(fd, contents, strlen(contents) + 1);
+
+    if (n < 0)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool comm_read_msg(int fd, char* buffer, int buff_size)
+{
+    int n = read(fd, buffer, buff_size);
+
+    if (n < 0)
+    {
+        return false;
+    }
+
+    return true;
 }

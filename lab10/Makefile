@@ -1,7 +1,7 @@
 # We specify what kind of extensions we want to clean up
 CLEAN_EXTS = o a
 
-COMMON_SRC_FILES = src/comm.c
+COMMON_SRC_FILES = src/comm.c src/defs.c src/game_state.c
 SERVER_SRC_FILES = src/server.c
 CLIENT_SRC_FILES = src/client.c
 #OPTIMIZATION = -O2
