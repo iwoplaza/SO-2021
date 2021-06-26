@@ -11,7 +11,7 @@ A repository for projects made for the Operating Systems 2021 course at AGH Univ
 - [x] Lab 7 (100%)
 - [x] Lab 8 (100%)
 - [x] Lab 9 (100%)
-- ~~[ ] Lab 10 (0%)~~
+- [ ] ~~Lab 10 (0%)~~
 
 ## Kolokwia:
 - [x] Kolokwium 1 (100%)
@@ -19,7 +19,7 @@ A repository for projects made for the Operating Systems 2021 course at AGH Univ
 
 ## Treści zadań
 - [Lab 1](./lab1.pdf)
-- [Lab 2](./lab2.pdf) (materiały pomocnicze: [1](./lab2_materialy1.pdf), [2](./lab2_materialy2.pdf))
+- [Lab 2](./lab2.pdf) (materiały pomocnicze: [1](./lab2_materialy.pdf), [2](./lab2_materialy2.pdf))
 - [Lab 3](./lab3.pdf) (materiały pomocnicze: [tutaj](./lab3_materialy.pdf))
 - [Lab 4](./lab4.pdf) (materiały pomocnicze: [tutaj](./lab4_materialy.pdf))
 - [Lab 5](./lab5.pdf) (materiały pomocnicze: [tutaj](./lab5_materialy.pdf))
