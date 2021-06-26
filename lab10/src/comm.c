@@ -11,7 +11,6 @@
 #include <unistd.h>
 
 #include <errno.h>
-#include "defs.h"
 
 #ifdef USE_TCP
     #define SOCK_TYPE SOCK_STREAM
@@ -98,7 +97,7 @@ ServerComm_t* comm_server_init(int port, const char* socket_path)
 
     struct epoll_event ev;
     ev.data.fd = local_fd;
-    ev.events = EPOLLIN;
+    ev.events = EPOLLIN | EPOLLET;
 
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, local_fd, &ev) < 0)
     {
@@ -107,7 +106,7 @@ ServerComm_t* comm_server_init(int port, const char* socket_path)
     }
 
     ev.data.fd = online_fd;
-    ev.events = EPOLLIN;
+    ev.events = EPOLLIN | EPOLLET;
 
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, online_fd, &ev) < 0)
     {
@@ -313,24 +312,67 @@ void comm_client_free(ClientComm_t* comm)
 
 bool comm_send_msg(int fd, const char* contents)
 {
-    int n = write(fd, contents, strlen(contents) + 1);
+    int n = write(fd, contents, strlen(contents));
 
     if (n < 0)
     {
         return false;
+    }
+
+    write(fd, ";", 1);
+
+    return true;
+}
+
+bool comm_read_msgs(int fd, MessageQueue_t* queue)
+{
+    static char buffer[256];
+
+    int n = read(fd, buffer, 256);
+
+    if (n < 0)
+    {
+        return false;
+    }
+
+    char* token = strtok(buffer, ";");
+
+    while (token != NULL)
+    {
+        printf("Token: '%s'\n", token);
+        mq_push_back(queue, token);
+
+        token = strtok(NULL, ";");
     }
 
     return true;
 }
 
-bool comm_read_msg(int fd, char* buffer, int buff_size)
+MessageType_t get_and_validate_msg_type(char* msg_buffer)
 {
-    int n = read(fd, buffer, buff_size);
+    MessageType_t msg_type;
+    sscanf(msg_buffer, "%d", &msg_type);
 
-    if (n < 0)
+    if (msg_type < 0 || msg_type >= MSG_MAX)
     {
-        return false;
+        return -1;
     }
 
-    return true;
+    return msg_type;
+}
+
+void expect_msg_type(char* msg_buffer, MessageType_t expected_type)
+{
+    MessageType_t msg_type = get_and_validate_msg_type(msg_buffer);
+    if (msg_type == -1)
+    {
+        fprintf(stderr, "Malformed packet.\n");
+        exit(1);
+    }
+
+    if (msg_type != expected_type)
+    {
+        fprintf(stderr, "Expected message of type %s, got %s.\n", MESSAGE_TYPE_NAMES[expected_type], MESSAGE_TYPE_NAMES[msg_type]);
+        exit(1);
+    }
 }

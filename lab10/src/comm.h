@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 #include <sys/epoll.h>
+#include "defs.h"
+#include "msgqueue.h"
 
 #define MAX_EVENTS 16
 
@@ -35,5 +37,7 @@ void comm_client_free(ClientComm_t* comm);
 
 // Common
 bool comm_send_msg(int fd, const char* contents);
-bool comm_read_msg(int fd, char* buffer, int buff_size);
+bool comm_read_msgs(int fd, MessageQueue_t* queue);
+MessageType_t get_and_validate_msg_type(char* msg_buffer);
+void expect_msg_type(char* msg_buffer, MessageType_t msg_type);
 #endif //LAB10_COMM_H

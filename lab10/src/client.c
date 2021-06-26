@@ -1,26 +1,47 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
+#include "logs.h"
 #include "defs.h"
 #include "comm.h"
+#include "game_state.h"
+#include "client_socket.h"
 
 #define CONN_REMOTE_STR "remote"
 #define CONN_LOCAL_STR "local"
 #define CONN_TYPES_STR CONN_REMOTE_STR "|" CONN_LOCAL_STR
 
+const char* HELP_STR = \
+    COL_YELLOW "move <col> <row>" COL_RESET " - Performs a move on a specific cell.\n" \
+    COL_YELLOW "stop            " COL_RESET " - Closes the client.\n";
 
-void parse_arguments();
-void run_event_loop(ClientComm_t* client);
+
+static void handle_shutdown();
+static void handle_commands();
+static void parse_arguments();
 
 const char* username;
 ConnectionType_t connection_type;
 const char* server_address;
 
-bool running = true;
+bool cli_running = true;
+bool in_game = false;
+GameState_t game_state;
+
+void handle_interrupt()
+{
+    exit(0);
+}
 
 int main(int argc, char** argv)
 {
-    printf("[CLIENT]\n");
+    signal(SIGINT, handle_interrupt);
+    atexit(handle_shutdown);
+    
+    printf("============\n");
+    printf("== CLIENT ==\n");
+    printf("============\n\n");
 
     if (argc != 4)
     {
@@ -42,11 +63,34 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    run_event_loop(client);
+    reset_game_state(&game_state);
+
+    SocketThreadArgs_t* thread_args = malloc(sizeof(SocketThreadArgs_t));
+    thread_args->client = client;
+    thread_args->game_state = &game_state;
+    thread_args->running = true;
+
+    pthread_t socket_thread = init_sockets(thread_args, username);
+
+    if (socket_thread == -1)
+    {
+        return 1;
+    }
+
+    handle_commands();
+
+    pthread_join(socket_thread, NULL);
 
     comm_client_free(client);
 
     return 0;
+}
+
+void handle_shutdown()
+{
+    printf("Shutting down...\n");
+
+    exit(0);
 }
 
 void parse_arguments(int argc, char** argv)
@@ -71,81 +115,41 @@ void parse_arguments(int argc, char** argv)
     server_address = argv[3];
 }
 
-void run_event_loop(ClientComm_t* client)
+void handle_move_cmd()
 {
-    static char msg_buffer[128];
+    printf("Moving...\n");
 
-    // Sending the join request
-    sprintf(msg_buffer, "%d %s", MSG_JOIN, username);
-    if (!comm_send_msg(client->socket_fd, msg_buffer))
+    
+
+    printf("Waiting for a move...");
+}
+
+void handle_commands()
+{
+    static char cmd_buffer[256];
+    
+    print_game_state(&game_state);
+
+    while (cli_running)
     {
-        fprintf(stderr, "Failed to send JOIN request\n");
-        return;
+        printf("> ");
+        scanf("%s", cmd_buffer);
+
+        if (strcmp(cmd_buffer, "help") == 0)
+        {
+            printf("%s", HELP_STR);
+        }
+        else if (strcmp(cmd_buffer, "move") == 0)
+        {
+            handle_move_cmd();
+        }
+        else if (strcmp(cmd_buffer, "stop") == 0)
+        {
+            cli_running = false;
+        }
+        else
+        {
+            printf("Unkown command. Type 'help' for list of commands.\n");
+        }
     }
-
-    if (!comm_read_msg(client->socket_fd, msg_buffer, 128))
-    {
-        fprintf(stderr, "Failed to read response to JOIN request\n");
-        return;
-    }
-
-    printf("Got JOIN response: %s\n", msg_buffer);
-
-//    while (running)
-//    {
-//
-//        int event_count = comm_wait_for_events(server, events);
-//
-//        for (int i = 0; i < event_count; ++i)
-//        {
-//            if (comm_handle_join_request(server, &events[i]))
-//            {
-//                // A client established a connection with us.
-//            }
-//            else
-//            {
-//                int client_fd = events[i].data.fd;
-//                // A client has sent us a message.
-//                char msg_buffer[256];
-//                bzero(msg_buffer, 256);
-//                int n = read(client_fd, msg_buffer, 255);
-//
-//                if (n < 0)
-//                {
-//                    perror("Failed to read from the socket.");
-//                    continue;
-//                }
-//
-//                MessageType_t msg_type;
-//                sscanf(msg_buffer, "%d", &msg_type);
-//
-//                if (msg_type < 0 || msg_type >= MSG_MAX)
-//                {
-//                    printf("Unknown message type: %d\n", msg_type);
-//                    continue;
-//                }
-//
-//                printf("Received a %s message from %d: %s\n", MESSAGE_TYPE_NAMES[msg_type], events[i].data.fd, msg_buffer);
-//
-//                switch (msg_type)
-//                {
-//                    case MSG_PING:
-//                        handle_ping_msg(msg_buffer, client_fd);
-//                        break;
-//                    case MSG_JOIN:
-//                        handle_join_msg(msg_buffer, client_fd);
-//                        break;
-//                    case MSG_MOVE:
-//                        handle_join_msg(msg_buffer, client_fd);
-//                        break;
-//                    case MSG_QUIT:
-//                        handle_join_msg(msg_buffer, client_fd);
-//                        break;
-//                    default:
-//                        fprintf(stderr, "Received message of unknown type: %d\n", msg_type);
-//                        break;
-//                }
-//            }
-//        }
-//    }
 }

@@ -104,10 +104,10 @@ int main(int argc, char** argv)
                         handle_join_msg(msg_buffer, client_fd);
                         break;
                     case MSG_MOVE:
-                        handle_join_msg(msg_buffer, client_fd);
+                        handle_move_msg(msg_buffer, client_fd);
                         break;
                     case MSG_QUIT:
-                        handle_join_msg(msg_buffer, client_fd);
+                        handle_quit_msg(msg_buffer, client_fd);
                         break;
                     default:
                         fprintf(stderr, "Received message of unknown type: %d\n", msg_type);
@@ -200,9 +200,21 @@ void handle_join_msg(char* msg_buffer, int client_fd)
 
         serialize_game_state(response_buffer + 2, &instance->state);
 
-        comm_send_msg(client_fd, response_buffer);
+        if (!comm_send_msg(instance->players[0].fd, response_buffer))
+        {
+            fprintf(stderr, "Failed to send JOIN response to player 0\n");
+            perror("Error details");
+            exit(1);
+        }
 
-        printf("Sending message: '%s'\n", response_buffer);
+        if (!comm_send_msg(instance->players[1].fd, response_buffer))
+        {
+            fprintf(stderr, "Failed to send JOIN response to player 1\n");
+            perror("Error details");
+            exit(1);
+        }
+
+        printf("Sending message: '%s' to %d and %d\n", response_buffer, instance->players[0].fd, instance->players[1].fd);
     }
 }
 
